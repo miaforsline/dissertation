@@ -6,9 +6,9 @@ date: "2024-04-21"
 
 # Objective
 
-To run a power analysis for Jacquelyn Chin's 2024 dissertation draft. 
+To run a power analysis for Jacquelyn Chin's 2024 dissertation proposal. 
 
-Tutorial can be found here: https://ladal.edu.au/pwr.html#What_determines_if_you_find_an_effect
+This power analysis is based off the following Language Technology and Data Analysis Labratory (LADL) tutorial:  [https://ladal.edu.au/pwr.html#What_determines_if_you_find_an_effect](https://ladal.edu.au/pwr.html#What_determines_if_you_find_an_effect)
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -32,54 +32,58 @@ if (!require(librarian)){
 librarian::shelf(
   tidyverse,
   pwr,
-  lme4,
-  sjPlot,
-  simr,
-  effectsize,
-  DT,
-  knitr,
-  flextable,
-  pacman,
-  
-  remotes
+  #lme4,
+  #sjPlot,
+  #simr,
+  #effectsize,
+  #DT,
+  #knitr,
+  #flextable,
+  #pacman,
+  #remotes
   )
 
-pacman::p_load_gh("trinker/entity")
+# pacman::p_load_gh("trinker/entity")
+# 
+# # install.packages("remotes")
+# remotes::install_github("rlesur/klippy")
 
-# install.packages("remotes")
-remotes::install_github("rlesur/klippy")
-
-# activate klippy for copy-to-clipboard button
-klippy::klippy()
+# # activate klippy for copy-to-clipboard button
+# klippy::klippy()
 ```
 
 # One-way ANOVA
 
+If we know what effect size we want to detect and know we plan to use an ANOVA, we can use a power analysis to estimate the minimum number of samples we need. 
+
 ## Known effect size + unknown sample size 
 
-Let check how to calculate the necessary sample size for each group for a one-way ANOVA that compares 5 groups (k) and that has a power of 0.80 (80 percent), when the effect size is moderate (f = 0.25) and the significance level is 0.05 (5 percent)..
+Let check how to calculate the necessary sample size for each group for a one-way ANOVA that compares k groups and that has a power of 0.80 (80 percent), when the effect size is moderate (f = 0.25) and the significance level is 0.05 (5 percent).
 
 ```{r}
 # load package
 library(pwr)
 
 # calculate minimal sample size
-pwr.anova.test(k=4,           # 4 groups are compared
-               f=.4,          # large effect size
-               sig.level=.05,  # alpha/sig. level = .05
-               power=.8)       # confint./power = .8
+pwr.anova.test(k = 2,               # k groups are compared
+               f = .4,              # large effect size
+               sig.level = 0.05,    # alpha/sig. level = .05
+               power = 0.8)         # confint./power = .8
 ```
+
+If we have a predetermined sample size and know we plan to use an ANOVA, we can use a power analysis to estimate what effect size we will be able to reliably detect. 
+
 ## Known sample size + unknown effect size 
 
 Let’s check how we could calculate the power if we had already collected data (with 30 participants in each group) and we want to report the power of our analysis (and let us assume that the effect size was medium).
 
-
 ```{r}
 # calculate minimal sample size
-pwr.anova.test(k=4,            # 4 groups are compared
-               f=.25,          # moderate effect size
-               sig.level=.05,  # alpha/sig. level = .05
-               n=30) 
+pwr.anova.test(k = 2,               # k groups are compared
+               f = 0.25,            # moderate effect size
+               sig.level = 0.05,    # alpha/sig. level = .05
+               n = 30) 
 ```
 
-In this case our analysis would only have a power or 66.8 percent. This means that we would only detect a medium sized effect in 66.7 percent of cases (which is considered insufficient).
+In this case our analysis would only have a power of 47.8% This means that we would only detect a medium sized effect in 47.8% of cases (which is considered insufficient).
+
