@@ -78,7 +78,7 @@ If we have a predetermined sample size and know we plan to use an ANOVA, we can 
 Let’s check how we could calculate the power if we had already collected data (with 30 participants in each group) and we want to report the power of our analysis (and let us assume that the effect size was medium).
 
 ```{r}
-# calculate minimal sample size
+# calculate effect size 
 pwr.anova.test(k = 2,               # k groups are compared
                f = 0.25,            # moderate effect size
                sig.level = 0.05,    # alpha/sig. level = .05
