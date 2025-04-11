@@ -9,8 +9,6 @@ output: html_document
 
 To pull up the descriptives/demographic data for the Black, Queer & Liberated mental health intervention project. This is part of Jacquelyn Chin's 2025 dissertation defense. Almost at the finish line, baddie!!
 
-
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
 	echo = FALSE,
@@ -20,35 +18,41 @@ knitr::opts_chunk$set(
 options(knitr.duplicate.label = "allow",
         scipen = 999)
 
-# set options
-options(stringsAsFactors = F)         # no automatic conversion of factors
-options("scipen" = 100, "digits" = 4) # suppress math annotation
-options(max.print=1000)               # print max 1000 results
-
 #install packages if necessary, then load libraries
 if (!require(librarian)){
   install.packages("librarian")
   library(librarian)
 }
 librarian::shelf(
-  tidyverse,
-  pwr,
-  #lme4,
-  #sjPlot,
-  #simr,
-  #effectsize,
-  #DT,
-  #knitr,
-  #flextable,
-  #pacman,
-  #remotes
+  here, #for file paths
+  janitor, #for column name cleaning
+  lubridate, #for working with dates 
+  readxl, #read in Excel files
+  tidyverse, #general data cleaning functions and collection of common packages
+  writexl #save Excel files
   )
-
-# pacman::p_load_gh("trinker/entity")
-# 
-# # install.packages("remotes")
-# remotes::install_github("rlesur/klippy")
-
-# # activate klippy for copy-to-clipboard button
-# klippy::klippy()
 ```
+
+# Read in the data
+### Command + option + I makes a code chunk appear on the Mac
+- Race/Ethnicity 
+
+```{r read_in_race}
+#filepath & here function takes everything in green & helps R locate the correct file path
+filepath <- here("../")
+#"../" means one file outside of this file
+print(filepath)
+#filename function tells R where the exact file is located
+filename <- list.files(path = filepath, 
+                        pattern = "BQL Survey Data - CLEAN.xlsx")
+print(filename)
+#print function means 'show me what is in thie file'
+
+BQL_Data <- read_excel(path = here(filepath, filename[1]), sheet = 1) 
+```
+
+
+
+
+
+
