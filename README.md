@@ -6,4 +6,3 @@ This repository contains R scripts for preliminary data analysis for Jacquelyn C
 
 This repo will contain scripts for the Demographic data, Friedman's tests & pairwise comparison's of the "Black, Queer, & Liberated" dissertation project. (April 11th, 2025)
 
-Test
