@@ -51,7 +51,19 @@ print(filename)
 BQL_Data <- read_excel(path = here(filepath, filename[1]), sheet = 1) 
 ```
 
+Cleaning Excel data in R
+Dropped dummy paeticpatins from survey results
 
+```{r}
+#(option + minus sign) allows you to assign the function 
+BQL_Data_Clean <- BQL_Data %>% 
+  #(shift + command + m) creates a pipe symbol
+  filter(
+    Q1 == "BELL" | Q1 == "BER" | Q1 == "LAS"
+  ) %>% 
+  drop_na(Q4)
+#filter function tells Data what to pull out from the Excel sheet
+```
 
 
 
