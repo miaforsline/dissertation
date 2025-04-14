@@ -52,7 +52,7 @@ BQL_Data <- read_excel(path = here(filepath, filename[1]), sheet = 1)
 ```
 
 Cleaning Excel data in R
-Dropped dummy paeticpatins from survey results
+Dropped dummy participants from survey results
 
 ```{r}
 #(option + minus sign) allows you to assign the function 
@@ -65,6 +65,19 @@ BQL_Data_Clean <- BQL_Data %>%
 #filter function tells Data what to pull out from the Excel sheet
 ```
 
+Count/tally up Descriptive numbers from pre-survey data
+NUMBER (#) of people who checked each category
+- Race/Ethnicity
+- Gender
+- Sexual Orientation
+- Relationship Status
+- Education
+- Employment
+- Income
+- Political Action
 
-
+PHQ-4 Anxiety & Depression (ALL ITEMS in Q8.Q8_1, Q8_2, Q8_3, and Q8_4)
+- Averaging the total of this measure's items for 3 people
+- Running the Friedman's Test Across Pre-Survey > Week 2 > Week 4 > Week 6 > Post-Test > Follow-Up 
+- This will tell us the spread of the 3 values across 6 timepoints
 
