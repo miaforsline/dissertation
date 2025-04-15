@@ -35,6 +35,7 @@ librarian::shelf(
   lubridate, #for working with dates 
   readxl, #read in Excel files
   tidyverse, #general data cleaning functions and collection of common packages
+  dyplyr, #case_match
   writexl #save Excel files
   )
 ```
@@ -102,7 +103,7 @@ NUMBER (#) of people who checked each category
 
 First, we will look at all the questions participants answered (in the Pre-Survey)
 
-```{r}
+```{r questions}
 questions <- BQL_Data %>% 
   filter(StartDate == "Start Date") %>% 
   pivot_longer(
@@ -118,15 +119,151 @@ questions <- BQL_Data %>%
 nrow(questions)
 ```
 
+Next, we will read about how to [Recode Variables](https://www.anyamemensah.com/blog/recoding) in R. 
+
 Then we will look at what participants answered when asked about: 
 - their Race/Ethnicity (Q36 and Q36_11_TEXT)
 
-```{r}
+```{r race_ethnicity}
 race_ethnicity <- BQL_Data_Clean %>% 
   select(Q1,
          Q36,
-         Q36_11_TEXT)
+         Q36_11_TEXT) %>% 
+  mutate(
+    #create a new column called "Description"
+    Description = 
+      #if/then statements 
+      case_when(
+        Q36 == 1 ~ "Black or African American",
+        Q36 == "1,2,9,11" ~ "Black or African American, African (not American), White American, Another race/ethnicity (please specify), Creole"
+    )
+  )
+
+race_ethnicity_summary <- race_ethnicity %>% 
+  group_by(Description) %>% 
+  summarise(
+    Description = Description, 
+    n = n()
+  ) %>% 
+  ungroup() %>% 
+  unique()
+
 ```
+
+- Gender (Q34 and Q34_7_TEXT)
+
+```{r gender}
+gender <- BQL_Data_Clean %>% 
+  select(Q1,
+         Q34,
+         Q34_7_TEXT) %>% 
+  mutate(
+    #create a new column called "Description"
+    Description = 
+      #if/then statements 
+      case_when(
+        Q34 == 1 ~ "Woman",
+        Q34 == 2 ~ "Man",
+        Q34 == "1,3" ~ "Woman, Nonbinary",
+    )
+  )
+
+gender_summary <- gender %>% 
+  group_by(Description) %>% 
+  summarise(
+    Description = Description, 
+    n = n()
+  ) %>% 
+  ungroup() %>% 
+  unique()
+```
+
+- Sexual Orientation (Q35 and Q35_10_TEXT)
+
+```{r sexual_orientation}
+sexual_orientation <- BQL_Data_Clean %>% 
+  select(Q1,
+         Q35,
+         Q35_10_TEXT) %>% 
+  mutate(
+    #create a new column called "Description"
+    Description = 
+      #if/then statements 
+      case_when(
+        Q35 == 2 ~ "Bisexual",
+        Q35 == 5 ~ "Queer"
+    )
+  )
+
+sexual_orientation_summary <- sexual_orientation %>% 
+  group_by(Description) %>% 
+  summarise(
+    Description = Description, 
+    n = n()
+  ) %>% 
+  ungroup() %>% 
+  unique()
+```
+
+- Relationship Status (Q5 and Q5_7_TEXT)
+
+```{r relationship_status}
+relationship_status <- BQL_Data_Clean %>% 
+  select(Q1,
+         Q5,
+         Q5_7_TEXT) %>% 
+  mutate(
+    #create a new column called "Description"
+    Description = 
+      #if/then statements 
+      case_when(
+        Q5 == 1 ~ "Single",
+        Q5 == 2 ~ "In a Relationship", 
+        Q5 == "1,6" ~ "Single, Separated"
+    )
+  )
+
+relationship_status_summary <- relationship_status %>% 
+  group_by(Description) %>% 
+  summarise(
+    Description = Description, 
+    n = n()
+  ) %>% 
+  ungroup() %>% 
+  unique()
+```
+
+- Education (Q4)
+
+```{r education}
+education <- BQL_Data_Clean %>% 
+  select(Q1,
+         Q4)
+```
+
+- Employment (Q41 and Q41_4_TEXT)
+
+```{r employment}
+employment <- BQL_Data_Clean %>% 
+  select(Q1,
+         Q41,
+         Q41_4_TEXT)
+```
+
+- Income (Q6)
+
+```{r income}
+income <- BQL_Data_Clean %>% 
+  select(Q1,
+         Q6)
+```
+
+- Political Action
+
+```{r for_jackie_to_finish}
+
+```
+
 
 
 
