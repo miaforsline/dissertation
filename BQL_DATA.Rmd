@@ -1,13 +1,19 @@
 ---
 title: "BQL Data Analysis"
-author: "Jackie & Mia"
+author: "Jackie Chin & Mia Forsline"
 date: "2025-04-11"
 output: html_document
 ---
 
 # Objective
 
-To pull up the descriptives/demographic data for the Black, Queer & Liberated mental health intervention project. This is part of Jacquelyn Chin's 2025 dissertation defense. Almost at the finish line, baddie!!
+- To pull up the descriptives/demographic data for the Black, Queer & Liberated mental health intervention project. 
+- To clean and visualize the data
+- To run and interpret: 
+  - non-parametric ANOVA tests (AKA Friedman's tests)
+  - pairwise comparison tests
+
+This is part of Jacquelyn Chin's 2025 dissertation defense. Almost at the finish line, baddie!!
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -24,7 +30,7 @@ if (!require(librarian)){
   library(librarian)
 }
 librarian::shelf(
-  here, #for file paths
+  here, #to build file paths
   janitor, #for column name cleaning
   lubridate, #for working with dates 
   readxl, #read in Excel files
@@ -34,25 +40,31 @@ librarian::shelf(
 ```
 
 # Read in the data
-### Command + option + I makes a code chunk appear on the Mac
-- Race/Ethnicity 
+- The raw Excel data was exported from Qualtrics 
+
+First, create an R chunk: Command + option + I makes a code chunk appear on the Mac
 
 ```{r read_in_race}
 #filepath & here function takes everything in green & helps R locate the correct file path
 filepath <- here("../")
 #"../" means one file outside of this file
-print(filepath)
+print(filepath) #double check the filepath is correct
 #filename function tells R where the exact file is located
-filename <- list.files(path = filepath, 
-                        pattern = "BQL Survey Data - CLEAN.xlsx")
-print(filename)
-#print function means 'show me what is in thie file'
 
+filename <- list.files(path = filepath, pattern = "BQL Survey Data - CLEAN.xlsx") #which file do we want to read in?
+
+print(filename) #check which file we have selected
+#print function means 'show me what is in this file'
+
+#read_excel() reads in Excel files
 BQL_Data <- read_excel(path = here(filepath, filename[1]), sheet = 1) 
 ```
 
-Cleaning Excel data in R
-Dropped dummy participants from survey results
+# Cleaning the data 
+We want to drop the "dummy" participants from survey results 
+- AKA we want to remove fake data based on Q1
+- Jackie indicated that there are 3 real participants: BELL, BER, and LAS
+- We will remove everyone else 
 
 ```{r}
 #(option + minus sign) allows you to assign the function 
@@ -65,7 +77,10 @@ BQL_Data_Clean <- BQL_Data %>%
 #filter function tells Data what to pull out from the Excel sheet
 ```
 
-Count/tally up Descriptive numbers from pre-survey data
+# Descriptive/Demographic Data
+
+Next, we want to count/tally up Descriptive numbers from pre-survey data
+
 NUMBER (#) of people who checked each category
 - Race/Ethnicity
 - Gender
