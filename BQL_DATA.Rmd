@@ -8,10 +8,8 @@ output: html_document
 # Objective
 
 - To pull up the descriptives/demographic data for the Black, Queer & Liberated mental health intervention project. 
-- To clean and visualize the data
-- To run and interpret: 
-  - non-parametric ANOVA tests (AKA Friedman's tests)
-  - pairwise comparison tests
+- To clean the data
+- To summarize and visualize demographic data 
 
 This is part of Jacquelyn Chin's 2025 dissertation defense. Almost at the finish line, baddie!!
 
@@ -30,12 +28,14 @@ if (!require(librarian)){
   library(librarian)
 }
 librarian::shelf(
+  expss, #to make tables
   here, #to build file paths
   janitor, #for column name cleaning
   lubridate, #for working with dates 
   readxl, #read in Excel files
+  tidyr, #data cleaning
   tidyverse, #general data cleaning functions and collection of common packages
-  dyplyr, #case_match
+  dplyr, #case_match
   writexl #save Excel files
   )
 ```
@@ -54,13 +54,21 @@ filepath <- here("../")
 print(filepath) #double check the filepath is correct
 #filename function tells R where the exact file is located
 
-filename <- list.files(path = filepath, pattern = "BQL Survey Data - CLEAN.xlsx") #which file do we want to read in?
+filename <- list.files(path = filepath, pattern = "BQL Survey Data - CLEAN - FINAL.xlsx") #which file do we want to read in?
 
 print(filename) #check which file we have selected
 #print function means 'show me what is in this file'
 
 #read_excel() reads in Excel files
-BQL_Data <- read_excel(path = here(filepath, filename[1]), sheet = 1) 
+pre_survey <- read_excel(path = here(filepath, filename[1]), sheet = 1) 
+week1 <- read_excel(path = here(filepath, filename[1]), sheet = 2) 
+week2 <- read_excel(path = here(filepath, filename[1]), sheet = 3)
+week3 <- read_excel(path = here(filepath, filename[1]), sheet = 4)
+week4 <- read_excel(path = here(filepath, filename[1]), sheet = 5)
+week5 <- read_excel(path = here(filepath, filename[1]), sheet = 6)
+week6 <- read_excel(path = here(filepath, filename[1]), sheet = 7)
+post_survey <- read_excel(path = here(filepath, filename[1]), sheet = 8)
+follow_up <- read_excel(path = here(filepath, filename[1]), sheet = 9)
 ```
 
 # Cleaning the data 
@@ -74,7 +82,7 @@ We want to drop the "dummy" participants from survey results
 ##you can also type out the assignment arrow
 
 #first, we will create a "clean" version of the data based on the original BQL_Data object
-BQL_Data_Clean <- BQL_Data %>% 
+pre_survey_clean <- pre_survey %>% 
   #(shift + command + m) creates a pipe symbol
   
   #then we will filter based on column Q1
@@ -104,7 +112,7 @@ NUMBER (#) of people who checked each category
 First, we will look at all the questions participants answered (in the Pre-Survey)
 
 ```{r questions}
-questions <- BQL_Data %>% 
+questions <- pre_survey %>% 
   filter(StartDate == "Start Date") %>% 
   pivot_longer(
     cols = starts_with("Q"),
@@ -121,147 +129,350 @@ nrow(questions)
 
 Next, we will read about how to [Recode Variables](https://www.anyamemensah.com/blog/recoding) in R. 
 
+Then, we will read in the Code Book Jackie developed
+
+```{r codebook}
+#filepath & here function takes everything in green & helps R locate the correct file path
+filepath <- here("../")
+#"../" means one file outside of this file
+print(filepath) #double check the filepath is correct
+#filename function tells R where the exact file is located
+
+filename <- list.files(path = filepath, pattern = "BQL Master Codebook.xlsx") #which file do we want to read in?
+
+print(filename) #check which file we have selected
+#print function means 'show me what is in this file'
+
+#read_excel() reads in Excel files
+codebook_demographics <- read_excel(path = here(filepath, filename[1]), sheet = 1) %>% 
+  mutate("Source Construct" = "NA")
+codebook_anxiety <- read_excel(path = here(filepath, filename[1]), sheet = 2) 
+codebook_ryff <- read_excel(path = here(filepath, filename[1]), sheet = 3)
+codebook_ryff <- codebook_ryff[,1:5]
+codebook_black <- read_excel(path = here(filepath, filename[1]), sheet = 4) %>% 
+  mutate("Source Construct" = "NA")
+codebook_lgbt <- read_excel(path = here(filepath, filename[1]), sheet = 5) %>% 
+  mutate("Source Construct" = "NA")
+codebook_action <- read_excel(path = here(filepath, filename[1]), sheet = 6) %>% 
+  mutate("Source Construct" = "NA")
+codebook_consciousness <- read_excel(path = here(filepath, filename[1]), sheet = 7) %>% 
+  mutate("Source Construct" = "NA")
+codebook_community <- read_excel(path = here(filepath, filename[1]), sheet = 8) %>% 
+  mutate("Source Construct" = "NA")
+codebook_hope <- read_excel(path = here(filepath, filename[1]), sheet = 9) %>% 
+  mutate("Source Construct" = "NA")
+codebook_empowerment <- read_excel(path = here(filepath, filename[1]), sheet = 10) %>% 
+  mutate("Source Construct" = "NA")
+
+codebook <- rbind(
+  codebook_demographics,
+  codebook_anxiety,
+  codebook_ryff,
+  codebook_black,
+  codebook_lgbt,
+  codebook_action,
+  codebook_consciousness,
+  codebook_community,
+  codebook_hope,
+  codebook_empowerment
+)
+```
+
+
 Then we will look at what participants answered when asked about: 
 - their Race/Ethnicity (Q36 and Q36_11_TEXT)
 
 ```{r race_ethnicity}
-race_ethnicity <- BQL_Data_Clean %>% 
+race_ethnicity <- pre_survey_clean %>% 
   select(Q1,
-         Q36,
-         Q36_11_TEXT) %>% 
-  mutate(
-    #create a new column called "Description"
-    Description = 
-      #if/then statements 
-      case_when(
-        Q36 == 1 ~ "Black or African American",
-        Q36 == "1,2,9,11" ~ "Black or African American, African (not American), White American, Another race/ethnicity (please specify), Creole"
-    )
-  )
+         Q36) %>% 
+  pivot_longer(
+    cols = !Q1, 
+    names_to = "Variable Name",
+    values_to = "Value"
+  ) %>% 
+  mutate(Value = strsplit(as.character(Value), ",")) %>% 
+    unnest(Value) 
 
-race_ethnicity_summary <- race_ethnicity %>% 
-  group_by(Description) %>% 
+#join the codebook descriptions
+race_ethnicity_description <- left_join(x = race_ethnicity, y = codebook) %>% 
+  select(-"Source Construct") %>% 
+  mutate("Question Text" = "Race") 
+
+race_ethnicity_description$Label[!is.na(race_ethnicity_description$Value) & is.na(race_ethnicity_description$Label)] <- race_ethnicity_description$Value
+
+race_ethnicity_summary <- race_ethnicity_description %>% 
+  group_by(Label) %>% 
   summarise(
-    Description = Description, 
-    n = n()
+    Label = Label, 
+    n = n(),
   ) %>% 
   ungroup() %>% 
-  unique()
+  unique() %>% 
+  drop_na() %>% 
+  adorn_totals(where = "row", na.rm = TRUE, name = "Total")
 
+race_ethnicity_summary$n[race_ethnicity_summary$Label == "Total"] <- length(unique(race_ethnicity$Q1))
+
+print(race_ethnicity_summary)
 ```
 
 - Gender (Q34 and Q34_7_TEXT)
 
 ```{r gender}
-gender <- BQL_Data_Clean %>% 
+gender <- pre_survey_clean %>% 
   select(Q1,
          Q34,
          Q34_7_TEXT) %>% 
-  mutate(
-    #create a new column called "Description"
-    Description = 
-      #if/then statements 
-      case_when(
-        Q34 == 1 ~ "Woman",
-        Q34 == 2 ~ "Man",
-        Q34 == "1,3" ~ "Woman, Nonbinary",
-    )
-  )
+  pivot_longer(
+    cols = !Q1, 
+    names_to = "Variable Name",
+    values_to = "Value"
+  ) %>% 
+  mutate(Value = strsplit(as.character(Value), ",")) %>% 
+    unnest(Value) %>% 
+  drop_na(Value)
 
-gender_summary <- gender %>% 
-  group_by(Description) %>% 
+#join the codebook descriptions
+gender_description <- left_join(x = gender, y = codebook) %>% 
+  select(-"Source Construct") %>% 
+  mutate("Question Text" = "Gender") 
+
+gender_summary <- gender_description %>% 
+  group_by(Label) %>% 
   summarise(
-    Description = Description, 
+    Label = Label, 
     n = n()
   ) %>% 
   ungroup() %>% 
-  unique()
+  unique() %>% 
+  drop_na() %>% 
+  adorn_totals(where = "row", na.rm = TRUE, name = "Total")
+
+gender_summary$n[gender_summary$Label == "Total"] <- length(unique(gender$Q1))
+
+print(gender_summary)
 ```
 
 - Sexual Orientation (Q35 and Q35_10_TEXT)
 
 ```{r sexual_orientation}
-sexual_orientation <- BQL_Data_Clean %>% 
+sexual_orientation <- pre_survey_clean %>% 
   select(Q1,
          Q35,
-         Q35_10_TEXT) %>% 
-  mutate(
-    #create a new column called "Description"
-    Description = 
-      #if/then statements 
-      case_when(
-        Q35 == 2 ~ "Bisexual",
-        Q35 == 5 ~ "Queer"
-    )
-  )
+         Q35_10_TEXT)  %>% 
+  pivot_longer(
+    cols = !Q1, 
+    names_to = "Variable Name",
+    values_to = "Value"
+  ) %>% 
+  mutate(Value = strsplit(as.character(Value), ",")) %>% 
+    unnest(Value) %>% 
+  drop_na(Value)
 
-sexual_orientation_summary <- sexual_orientation %>% 
-  group_by(Description) %>% 
+#join the codebook descriptions
+sexual_orientation_description <- left_join(x = sexual_orientation, y = codebook) %>% 
+  select(-"Source Construct") %>% 
+  mutate("Question Text" = "Sexual Orientation") 
+
+sexual_orientation_summary <- sexual_orientation_description %>% 
+  group_by(Label) %>% 
   summarise(
-    Description = Description, 
+    Label = Label, 
     n = n()
   ) %>% 
   ungroup() %>% 
-  unique()
+  unique() %>% 
+  drop_na() %>% 
+  adorn_totals(where = "row", na.rm = TRUE, name = "Total")
+
+sexual_orientation_summary$n[sexual_orientation_summary$Label == "Total"] <- length(unique(sexual_orientation$Q1))
+
+print(sexual_orientation_summary)
 ```
 
 - Relationship Status (Q5 and Q5_7_TEXT)
 
 ```{r relationship_status}
-relationship_status <- BQL_Data_Clean %>% 
+relationship_status <- pre_survey_clean %>% 
   select(Q1,
          Q5,
          Q5_7_TEXT) %>% 
-  mutate(
-    #create a new column called "Description"
-    Description = 
-      #if/then statements 
-      case_when(
-        Q5 == 1 ~ "Single",
-        Q5 == 2 ~ "In a Relationship", 
-        Q5 == "1,6" ~ "Single, Separated"
-    )
-  )
+  pivot_longer(
+    cols = !Q1, 
+    names_to = "Variable Name",
+    values_to = "Value"
+  ) %>% 
+  mutate(Value = strsplit(as.character(Value), ",")) %>% 
+    unnest(Value) %>% 
+  drop_na(Value)
 
-relationship_status_summary <- relationship_status %>% 
-  group_by(Description) %>% 
+#join the codebook descriptions
+relationship_status_description <- left_join(x = relationship_status, y = codebook) %>% 
+  select(-"Source Construct") %>% 
+  mutate("Question Text" = "Relationship Status") 
+
+relationship_status_summary <- relationship_status_description %>% 
+  group_by(Label) %>% 
   summarise(
-    Description = Description, 
+    Label = Label, 
     n = n()
   ) %>% 
   ungroup() %>% 
-  unique()
+  unique() %>% 
+  drop_na() %>% 
+  adorn_totals(where = "row", na.rm = TRUE, name = "Total")
+
+relationship_status_summary$n[relationship_status_summary$Label == "Total"] <- length(unique(relationship_status$Q1))
+
+print(relationship_status_summary)
 ```
 
 - Education (Q4)
 
 ```{r education}
-education <- BQL_Data_Clean %>% 
+education <- pre_survey_clean %>% 
   select(Q1,
-         Q4)
+         Q4) %>% 
+  pivot_longer(
+    cols = !Q1, 
+    names_to = "Variable Name",
+    values_to = "Value"
+  ) %>% 
+  mutate(Value = strsplit(as.character(Value), ",")) %>% 
+    unnest(Value) %>% 
+  drop_na(Value)
+
+#join the codebook descriptions
+education_description <- left_join(x = education, y = codebook) %>% 
+  select(-"Source Construct") %>% 
+  mutate("Question Text" = "Education") 
+
+education_summary <- education_description %>% 
+  group_by(Label) %>% 
+  summarise(
+    Label = Label, 
+    n = n()
+  ) %>% 
+  ungroup() %>% 
+  unique() %>% 
+  drop_na() %>% 
+  adorn_totals(where = "row", na.rm = TRUE, name = "Total")
+
+education_summary$n[education_summary$Label == "Total"] <- length(unique(education$Q1))
+
+print(education_summary)
 ```
 
 - Employment (Q41 and Q41_4_TEXT)
 
 ```{r employment}
-employment <- BQL_Data_Clean %>% 
+employment <- pre_survey_clean %>% 
   select(Q1,
          Q41,
-         Q41_4_TEXT)
+         Q41_4_TEXT) %>% 
+  pivot_longer(
+    cols = !Q1, 
+    names_to = "Variable Name",
+    values_to = "Value"
+  ) %>% 
+  mutate(Value = strsplit(as.character(Value), ",")) %>% 
+    unnest(Value) %>% 
+  drop_na(Value)
+
+#join the codebook descriptions
+employment_description <- left_join(x = employment, y = codebook) %>% 
+  select(-"Source Construct") %>% 
+  mutate("Question Text" = "Employment") 
+
+employment_summary <- employment_description %>% 
+  group_by(Label) %>% 
+  summarise(
+    Label = Label, 
+    n = n()
+  ) %>% 
+  ungroup() %>% 
+  unique() %>% 
+  drop_na() %>% 
+  adorn_totals(where = "row", na.rm = TRUE, name = "Total")
+
+employment_summary$n[employment_summary$Label == "Total"] <- length(unique(employment$Q1))
+
+print(employment_summary)
+
+
 ```
 
 - Income (Q6)
 
 ```{r income}
-income <- BQL_Data_Clean %>% 
+income <- pre_survey_clean %>% 
   select(Q1,
-         Q6)
+         Q6) %>% 
+  pivot_longer(
+    cols = !Q1, 
+    names_to = "Variable Name",
+    values_to = "Value"
+  ) %>% 
+  mutate(Value = strsplit(as.character(Value), ",")) %>% 
+    unnest(Value) %>% 
+  drop_na(Value)
+
+#join the codebook descriptions
+income_description <- left_join(x = income, y = codebook) %>% 
+  select(-"Source Construct") %>% 
+  mutate("Question Text" = "Income") 
+
+income_summary <- income_description %>% 
+  group_by(Label) %>% 
+  summarise(
+    Label = Label, 
+    n = n()
+  ) %>% 
+  ungroup() %>% 
+  unique() %>% 
+  drop_na() %>% 
+  adorn_totals(where = "row", na.rm = TRUE, name = "Total")
+
+income_summary$n[income_summary$Label == "Total"] <- length(unique(income$Q1))
+
+print(income_summary)
 ```
 
 - Political Action
 
 ```{r for_jackie_to_finish}
+political_action <- pre_survey_clean %>% 
+  select(Q1,
+         Q6) %>% 
+  pivot_longer(
+    cols = !Q1, 
+    names_to = "Variable Name",
+    values_to = "Value"
+  ) %>% 
+  mutate(Value = strsplit(as.character(Value), ",")) %>% 
+    unnest(Value) %>% 
+  drop_na(Value)
 
+#join the codebook descriptions
+political_action_description <- left_join(x = political_action, y = codebook) %>% 
+  select(-"Source Construct") %>% 
+  mutate("Question Text" = "political_action") 
+
+political_action_summary <- political_action_description %>% 
+  group_by(Label) %>% 
+  summarise(
+    Label = Label, 
+    n = n()
+  ) %>% 
+  ungroup() %>% 
+  unique() %>% 
+  drop_na() %>% 
+  adorn_totals(where = "row", na.rm = TRUE, name = "Total")
+
+political_action_summary$n[political_action_summary$Label == "Total"] <- length(unique(political_action$Q1))
+
+print(political_action_summary)
 ```
 
 # Scales
