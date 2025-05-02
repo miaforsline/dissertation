@@ -40,7 +40,7 @@ librarian::shelf(
   )
 ```
 
-# Read in Pre-Survey data
+# Read in Data
 - The raw Excel data was exported from Qualtrics 
 
 First, create an R chunk: Command + option + I makes a code chunk appear on the Mac
@@ -439,12 +439,16 @@ income_summary$n[income_summary$Label == "Total"] <- length(unique(income$Q1))
 print(income_summary)
 ```
 
-- Political Action
+- Critical Action
 
-```{r for_jackie_to_finish}
+Q17_1 through Q17_5
+
+```{r critical_action1}
 political_action <- pre_survey_clean %>% 
   select(Q1,
-         Q6) %>% 
+         Q17_1
+         
+         ) %>% 
   pivot_longer(
     cols = !Q1, 
     names_to = "Variable Name",
@@ -457,7 +461,147 @@ political_action <- pre_survey_clean %>%
 #join the codebook descriptions
 political_action_description <- left_join(x = political_action, y = codebook) %>% 
   select(-"Source Construct") %>% 
-  mutate("Question Text" = "political_action") 
+  mutate("Question Text" = "Critical Action") 
+
+political_action_summary <- political_action_description %>% 
+  group_by(Label) %>% 
+  summarise(
+    Label = Label, 
+    n = n()
+  ) %>% 
+  ungroup() %>% 
+  unique() %>% 
+  drop_na() %>% 
+  adorn_totals(where = "row", na.rm = TRUE, name = "Total")
+
+political_action_summary$n[political_action_summary$Label == "Total"] <- length(unique(political_action$Q1))
+
+print(political_action_summary)
+```
+
+```{r critical_action2}
+political_action <- pre_survey_clean %>% 
+  select(Q1,
+         Q17_2
+         ) %>% 
+  pivot_longer(
+    cols = !Q1, 
+    names_to = "Variable Name",
+    values_to = "Value"
+  ) %>% 
+  mutate(Value = strsplit(as.character(Value), ",")) %>% 
+    unnest(Value) %>% 
+  drop_na(Value)
+
+#join the codebook descriptions
+political_action_description <- left_join(x = political_action, y = codebook) %>% 
+  select(-"Source Construct") %>% 
+  mutate("Question Text" = "Critical Action") 
+
+political_action_summary <- political_action_description %>% 
+  group_by(Label) %>% 
+  summarise(
+    Label = Label, 
+    n = n()
+  ) %>% 
+  ungroup() %>% 
+  unique() %>% 
+  drop_na() %>% 
+  adorn_totals(where = "row", na.rm = TRUE, name = "Total")
+
+political_action_summary$n[political_action_summary$Label == "Total"] <- length(unique(political_action$Q1))
+
+print(political_action_summary)
+```
+
+```{r critical_action3}
+political_action <- pre_survey_clean %>% 
+  select(Q1,
+         Q17_3
+         ) %>% 
+  pivot_longer(
+    cols = !Q1, 
+    names_to = "Variable Name",
+    values_to = "Value"
+  ) %>% 
+  mutate(Value = strsplit(as.character(Value), ",")) %>% 
+    unnest(Value) %>% 
+  drop_na(Value)
+
+#join the codebook descriptions
+political_action_description <- left_join(x = political_action, y = codebook) %>% 
+  select(-"Source Construct") %>% 
+  mutate("Question Text" = "Critical Action") 
+
+political_action_summary <- political_action_description %>% 
+  group_by(Label) %>% 
+  summarise(
+    Label = Label, 
+    n = n()
+  ) %>% 
+  ungroup() %>% 
+  unique() %>% 
+  drop_na() %>% 
+  adorn_totals(where = "row", na.rm = TRUE, name = "Total")
+
+political_action_summary$n[political_action_summary$Label == "Total"] <- length(unique(political_action$Q1))
+
+print(political_action_summary)
+```
+
+```{r critical_action4}
+political_action <- pre_survey_clean %>% 
+  select(Q1,
+         Q17_4
+         ) %>% 
+  pivot_longer(
+    cols = !Q1, 
+    names_to = "Variable Name",
+    values_to = "Value"
+  ) %>% 
+  mutate(Value = strsplit(as.character(Value), ",")) %>% 
+    unnest(Value) %>% 
+  drop_na(Value)
+
+#join the codebook descriptions
+political_action_description <- left_join(x = political_action, y = codebook) %>% 
+  select(-"Source Construct") %>% 
+  mutate("Question Text" = "Critical Action") 
+
+political_action_summary <- political_action_description %>% 
+  group_by(Label) %>% 
+  summarise(
+    Label = Label, 
+    n = n()
+  ) %>% 
+  ungroup() %>% 
+  unique() %>% 
+  drop_na() %>% 
+  adorn_totals(where = "row", na.rm = TRUE, name = "Total")
+
+political_action_summary$n[political_action_summary$Label == "Total"] <- length(unique(political_action$Q1))
+
+print(political_action_summary)
+```
+
+```{r critical_action5}
+political_action <- pre_survey_clean %>% 
+  select(Q1,
+         Q17_5
+         ) %>% 
+  pivot_longer(
+    cols = !Q1, 
+    names_to = "Variable Name",
+    values_to = "Value"
+  ) %>% 
+  mutate(Value = strsplit(as.character(Value), ",")) %>% 
+    unnest(Value) %>% 
+  drop_na(Value)
+
+#join the codebook descriptions
+political_action_description <- left_join(x = political_action, y = codebook) %>% 
+  select(-"Source Construct") %>% 
+  mutate("Question Text" = "Critical Action") 
 
 political_action_summary <- political_action_description %>% 
   group_by(Label) %>% 
