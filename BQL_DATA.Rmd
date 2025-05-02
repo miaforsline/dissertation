@@ -621,13 +621,40 @@ print(political_action_summary)
 
 # Scales
 
+TASK FOR JACKIE: Double-check that descriptions are correct for analysis
+
 PHQ-4 Anxiety & Depression (ALL ITEMS in Q8.Q8_1, Q8_2, Q8_3, and Q8_4)
 - Averaging the total of this measure's items for 3 people
-- Running the Friedman's Test Across Pre-Survey > Week 2 > Week 4 > Week 6 > Post-Test > Follow-Up 
-- This will tell us the spread of the 3 values across 6 timepoints
+- Reporting the mean average scores in Pre-Survey > Week 2 > Week 4 > Week 6 > Post-Test > Follow-Up 
+- Group by person & average the scores
+
+MANUSCRIPT TEXT:
+- H1a: Participants were hypothesized to report lower scores on the PHQ-4 Anxiety & Depression scale at post-survey compared to pre-survey. Descriptive analysis showed that at pre-test, the
+mean average score was ## (n=3), at week 2, the average score was ##(n=3), at week 4, the mean average score was ## (n=2), at Week 6 the average was ## (n=1), at post-test, the average was ## (n=1), and at follow-up the mean average score was ## (n=1)
 
 ```{r read_in_data}
 
 
 ```
+Ryff Psychological Wellbeing Scale
+Scale
+Measure
+Which Weeks to Pull
+How Many People per timepoint
+Helpful to know their codes (e.g. Las, Bell, Tor)
 
+H1b: Participants were hypothesized to report higher scores on the Ryff Psychological Wellbeing Scale at post-test and follow-up than pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ## suggesting…. 
+
+H1c: Participants were hypothesized to report higher scores on the Black Identity Development Scale at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting... 
+
+H1d: Participants were hypothesized to report higher scores on the LGBT Positive Identity Measure at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting… 
+
+H1e: Participants were hypothesized to report greater self-compassion at post-test and follow-up compared to pre-test, as measured by the Self-Compassion Scale. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting... 
+
+H1f: Participants were hypothesized to report increased scores on the Short Critical Consciousness Scale and the Contemporary Critical Consciousness Measures I and II at post-test and follow-up compared to pre-test. Descriptive analysis showed that pre-test mean scores for each scale were ##, ##, and ## respectively, post-test scores were ##, ##, and ##, and follow-up scores were ##, ##, and ##, suggesting... 
+
+H1g: Participants were hypothesized to report higher scores on the Collective Self-Esteem Scale at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting... 
+
+H1h: Participants were hypothesized to report increased Radical Hope from pre- to post-test and follow-up. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting... 
+
+H1i: Participants were hypothesized to report higher scores on the Individual-Community Related Empowerment Measure at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting... 
