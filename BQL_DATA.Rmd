@@ -28,7 +28,7 @@ if (!require(librarian)){
   library(librarian)
 }
 librarian::shelf(
-  expss, #to make tables
+  #expss, #to make tables
   here, #to build file paths
   janitor, #for column name cleaning
   lubridate, #for working with dates 
@@ -40,7 +40,7 @@ librarian::shelf(
   )
 ```
 
-# Read in Data
+# Read in Survey Data
 - The raw Excel data was exported from Qualtrics 
 
 First, create an R chunk: Command + option + I makes a code chunk appear on the Mac
@@ -71,11 +71,15 @@ post_survey <- read_excel(path = here(filepath, filename[1]), sheet = 8)
 follow_up <- read_excel(path = here(filepath, filename[1]), sheet = 9)
 ```
 
-# Cleaning the data 
-We want to drop the "dummy" participants from survey results 
+# Clean the data 
+We want to drop the "dummy" participants from pre-survey results 
 - AKA we want to remove fake data based on Q1
 - Jackie indicated that there are 3 real participants: BELL, BER, and LAS
 - We will remove everyone else 
+
+Week 1 had no real data
+
+Refer to BQL Survey Data - CLEAN - FINAL to see how many real participants completed each week's survey
 
 ```{r}
 #(option + minus sign) is the keyboard shortcut for the assignment arrow (<-)
@@ -93,6 +97,62 @@ pre_survey_clean <- pre_survey %>%
   #then we will drop rows that have NA values in column Q4 because this row is incomplete data 
   drop_na(Q4)
 #filter function tells Data what to pull out from the Excel sheet
+
+week2_clean <- week2 %>% 
+  mutate(
+    Q1 = toupper(Q1)
+  ) %>% 
+  filter(
+    Q1 == "BELL" | Q1 == "LAS" | Q1 == "TOR"
+  )
+
+week3_clean <- week3 %>% 
+  mutate(
+    Q1 = toupper(Q1)
+  ) %>% 
+  filter(
+    Q1 == "BAL" | Q1 == "LAS" | Q1 == "TOR"
+  )
+
+week4_clean <- week4 %>% 
+  mutate(
+    Q1 = toupper(Q1)
+  ) %>% 
+  filter(
+    Q1 == "LAS" | Q1 == "TOR"
+  )
+
+week5_clean <- week5 %>% 
+  mutate(
+    Q1 = toupper(Q1)
+  ) %>% 
+  filter(
+    Q1 == "LAS" | Q1 == "TOR"
+  )
+
+week6_clean <- week6 %>% 
+  mutate(
+    Q1 = toupper(Q1)
+  ) %>% 
+  filter(
+    Q1 == "LAS"
+  )
+
+post_survey_clean <- post_survey %>% 
+  mutate(
+    Q1 = toupper(Q1)
+  ) %>% 
+  filter(
+    Q1 == "LAS"
+  )
+
+follow_up_clean <- follow_up %>% 
+  mutate(
+    Q1 = toupper(Q1)
+  ) %>% 
+  filter(
+    Q1 == "TOR"
+  )
 ```
 
 # Descriptive/Demographic Data
