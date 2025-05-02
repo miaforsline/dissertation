@@ -483,24 +483,7 @@ PHQ-4 Anxiety & Depression (ALL ITEMS in Q8.Q8_1, Q8_2, Q8_3, and Q8_4)
 - This will tell us the spread of the 3 values across 6 timepoints
 
 ```{r read_in_data}
-#filepath & here function takes everything in green & helps R locate the correct file path
-filepath <- here("../")
-#"../" means one file outside of this file
-print(filepath) #double check the filepath is correct
-#filename function tells R where the exact file is located
 
-filename <- list.files(path = filepath, pattern = "BQL Survey Data - CLEAN.xlsx") #which file do we want to read in?
 
-print(filename) #check which file we have selected
-#print function means 'show me what is in this file'
-
-#read_excel() reads in Excel files
-week1 <- read_excel(path = here(filepath, filename[1]), sheet = 2) 
-week2 <- read_excel(path = here(filepath, filename[1]), sheet = 3) 
-week3 <- read_excel(path = here(filepath, filename[1]), sheet = 4) 
-week4 <- read_excel(path = here(filepath, filename[1]), sheet = 5) 
-week5 <- read_excel(path = here(filepath, filename[1]), sheet = 6) 
-week6 <- read_excel(path = here(filepath, filename[1]), sheet = 7) 
-post_survey <- read_excel(path = here(filepath, filename[1]), sheet = 8) 
 ```
 
