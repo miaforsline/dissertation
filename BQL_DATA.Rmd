@@ -684,6 +684,12 @@ print(political_action_summary)
 
 TASK FOR JACKIE: Double-check that descriptions are correct for analysis
 
+Scale
+Measure
+Which Weeks to Pull
+How Many People per timepoint
+Helpful to know their codes (e.g. Las, Bell, Tor)
+
 ## PHQ-4 Anxiety & Depression
 
 PHQ-4 Anxiety & Depression (ALL ITEMS in Q8.Q8_1, Q8_2, Q8_3, and Q8_4)
@@ -888,13 +894,33 @@ print(class.df)
 
 ## Ryff Psychological Wellbeing Scale
 
-Scale
-Measure
-Which Weeks to Pull
-How Many People per timepoint
-Helpful to know their codes (e.g. Las, Bell, Tor)
+All Q9 questions
 
 H1b: Participants were hypothesized to report higher scores on the Ryff Psychological Wellbeing Scale at post-test and follow-up than pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ## suggesting…. 
+
+```{r pre_rhyff}
+pre_anxiety <- pre_survey_clean %>% 
+  select(
+    Q1, 
+    Q8_1,
+    Q8_2,
+    Q8_3,
+    Q8_4
+  ) %>% 
+  mutate(
+    Q8_1 = as.numeric(Q8_1),
+    Q8_2 = as.numeric(Q8_2),
+    Q8_3 = as.numeric(Q8_3),
+    Q8_4 = as.numeric(Q8_4),
+  )
+
+n <- (ncol(pre_anxiety) - 1)
+
+pre_anxiety$average <- (pre_anxiety$Q8_1 + pre_anxiety$Q8_2 + pre_anxiety$Q8_3 + pre_anxiety$Q8_4) / n
+
+print(pre_anxiety)
+```
+
 
 H1c: Participants were hypothesized to report higher scores on the Black Identity Development Scale at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting... 
 
