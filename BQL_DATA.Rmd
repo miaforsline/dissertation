@@ -33,6 +33,7 @@ librarian::shelf(
   janitor, #for column name cleaning
   lubridate, #for working with dates 
   readxl, #read in Excel files
+  stringr, #to clean data 
   tidyr, #data cleaning
   tidyverse, #general data cleaning functions and collection of common packages
   dplyr, #case_match
@@ -683,6 +684,8 @@ print(political_action_summary)
 
 TASK FOR JACKIE: Double-check that descriptions are correct for analysis
 
+## PHQ-4 Anxiety & Depression
+
 PHQ-4 Anxiety & Depression (ALL ITEMS in Q8.Q8_1, Q8_2, Q8_3, and Q8_4)
 - Averaging the total of this measure's items for 3 people
 - Reporting the mean average scores in Pre-Survey > Week 2 > Week 4 > Week 6 > Post-Test > Follow-Up 
@@ -692,11 +695,199 @@ MANUSCRIPT TEXT:
 - H1a: Participants were hypothesized to report lower scores on the PHQ-4 Anxiety & Depression scale at post-survey compared to pre-survey. Descriptive analysis showed that at pre-test, the
 mean average score was ## (n=3), at week 2, the average score was ##(n=3), at week 4, the mean average score was ## (n=2), at Week 6 the average was ## (n=1), at post-test, the average was ## (n=1), and at follow-up the mean average score was ## (n=1)
 
-```{r read_in_data}
+```{r pre_anxiety}
+pre_anxiety <- pre_survey_clean %>% 
+  select(
+    Q1, 
+    Q8_1,
+    Q8_2,
+    Q8_3,
+    Q8_4
+  ) %>% 
+  mutate(
+    Q8_1 = as.numeric(Q8_1),
+    Q8_2 = as.numeric(Q8_2),
+    Q8_3 = as.numeric(Q8_3),
+    Q8_4 = as.numeric(Q8_4),
+  )
 
+n <- (ncol(pre_anxiety) - 1)
 
+pre_anxiety$average <- (pre_anxiety$Q8_1 + pre_anxiety$Q8_2 + pre_anxiety$Q8_3 + pre_anxiety$Q8_4) / n
+
+print(pre_anxiety)
 ```
-Ryff Psychological Wellbeing Scale
+
+
+```{r}
+pre_anxiety_mean_avg <- round(mean(pre_anxiety$average), digits = 2)
+print(pre_anxiety_mean_avg)
+```
+
+```{r week2_anxiety}
+week2_anxiety <- week2_clean %>% 
+  select(
+    Q1, 
+    Q8_1,
+    Q8_2,
+    Q8_3,
+    Q8_4
+  ) %>% 
+  
+  #keep only the first digit in each column 
+  mutate(Q8_1 = gsub("(^\\d{1}).*", "\\1", Q8_1),
+         Q8_2 = gsub("(^\\d{1}).*", "\\1", Q8_2),
+         Q8_3 = gsub("(^\\d{1}).*", "\\1", Q8_3),
+         Q8_4 = gsub("(^\\d{1}).*", "\\1", Q8_4)) %>% 
+  mutate(
+    Q8_1 = as.numeric(Q8_1),
+    Q8_2 = as.numeric(Q8_2),
+    Q8_3 = as.numeric(Q8_3),
+    Q8_4 = as.numeric(Q8_4),
+  )
+
+n <- (ncol(week2_anxiety) - 1)
+
+week2_anxiety$average <- (week2_anxiety$Q8_1 + week2_anxiety$Q8_2 + week2_anxiety$Q8_3 + week2_anxiety$Q8_4) / n
+
+print(week2_anxiety)
+```
+
+
+```{r}
+week2_anxiety_mean_avg <- round(mean(week2_anxiety$average), digits = 2)
+print(week2_anxiety_mean_avg)
+```
+
+```{r week4_anxiety}
+week4_anxiety <- week4_clean %>% 
+  select(
+    Q1, 
+    Q8_1,
+    Q8_2,
+    Q8_3,
+    Q8_4
+  ) %>% 
+  
+  #keep only the first digit in each column 
+  mutate(Q8_1 = gsub("(^\\d{1}).*", "\\1", Q8_1),
+         Q8_2 = gsub("(^\\d{1}).*", "\\1", Q8_2),
+         Q8_3 = gsub("(^\\d{1}).*", "\\1", Q8_3),
+         Q8_4 = gsub("(^\\d{1}).*", "\\1", Q8_4)) %>% 
+  mutate(
+    Q8_1 = as.numeric(Q8_1),
+    Q8_2 = as.numeric(Q8_2),
+    Q8_3 = as.numeric(Q8_3),
+    Q8_4 = as.numeric(Q8_4),
+  )
+
+n <- (ncol(week4_anxiety) - 1)
+
+week4_anxiety$average <- (week4_anxiety$Q8_1 + week4_anxiety$Q8_2 + week4_anxiety$Q8_3 + week4_anxiety$Q8_4) / n
+
+print(week4_anxiety)
+```
+
+
+```{r}
+week4_anxiety_mean_avg <- round(mean(week4_anxiety$average), digits = 2)
+print(week4_anxiety_mean_avg)
+```
+
+```{r week6_anxiety}
+week6_anxiety <- week6_clean %>% 
+  clean_names() %>% 
+  select(
+    q1, 
+    phq_4_1,
+    phq_4_2,
+    phq_4_3,
+    phq_4_4
+  ) %>% 
+  
+  #keep only the first digit in each column 
+  mutate(phq_4_1 = gsub("(^\\d{1}).*", "\\1", phq_4_1),
+         phq_4_2 = gsub("(^\\d{1}).*", "\\1", phq_4_2),
+         phq_4_3 = gsub("(^\\d{1}).*", "\\1", phq_4_3),
+         phq_4_4 = gsub("(^\\d{1}).*", "\\1", phq_4_4)) %>% 
+  mutate(
+    phq_4_1 = as.numeric(phq_4_1),
+    phq_4_2 = as.numeric(phq_4_2),
+    phq_4_3 = as.numeric(phq_4_3),
+    phq_4_4 = as.numeric(phq_4_4),
+  )
+
+n <- (ncol(week6_anxiety) - 1)
+
+week6_anxiety$average <- (week6_anxiety$phq_4_1 + week6_anxiety$phq_4_2 + week6_anxiety$phq_4_3 + week6_anxiety$phq_4_4) / n
+
+print(week6_anxiety)
+```
+
+```{r follow_up_anxiety}
+follow_up_anxiety <- follow_up_clean %>% 
+  select(
+    Q1, 
+    Q8_1,
+    Q8_2,
+    Q8_3,
+    Q8_4
+  ) %>% 
+  
+  #keep only the first digit in each column 
+  mutate(Q8_1 = gsub("(^\\d{1}).*", "\\1", Q8_1),
+         Q8_2 = gsub("(^\\d{1}).*", "\\1", Q8_2),
+         Q8_3 = gsub("(^\\d{1}).*", "\\1", Q8_3),
+         Q8_4 = gsub("(^\\d{1}).*", "\\1", Q8_4)) %>% 
+  mutate(
+    Q8_1 = as.numeric(Q8_1),
+    Q8_2 = as.numeric(Q8_2),
+    Q8_3 = as.numeric(Q8_3),
+    Q8_4 = as.numeric(Q8_4),
+  )
+
+n <- (ncol(follow_up_anxiety) - 1)
+
+follow_up_anxiety$average <- (follow_up_anxiety$Q8_1 + follow_up_anxiety$Q8_2 + follow_up_anxiety$Q8_3 + follow_up_anxiety$Q8_4) / n
+
+print(follow_up_anxiety)
+```
+
+```{r mean_average_summary}
+# R program to illustrate 
+# data frame from vector 
+
+#how many surveys to summarize
+Survey <- c("Pre-Survey", 
+            "Week 2", 
+            "Week 4", 
+            "Week 6", 
+            "Follow-Up") 
+
+#how many participants per survey ?
+Participants <- c(nrow(pre_anxiety), 
+            nrow(week2_anxiety),
+            nrow(week4_anxiety),
+            nrow(week6_anxiety),
+            nrow(follow_up_anxiety)) 
+
+#mean average score per week
+MeanAverage <- c(pre_anxiety_mean_avg, 
+                  week2_anxiety_mean_avg, 
+                  week4_anxiety_mean_avg, 
+                  NA,
+                  NA)
+
+#create the data frame 
+class.df <- data.frame(Survey,
+                      Participants,
+                      MeanAverage) 
+print(class.df)
+```
+
+
+## Ryff Psychological Wellbeing Scale
+
 Scale
 Measure
 Which Weeks to Pull
