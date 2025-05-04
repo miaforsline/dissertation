@@ -1275,10 +1275,10 @@ H1g: Participants were hypothesized to report higher scores on the Collective Se
 pre_community <- pre_survey_clean %>% 
   select(
     Q1, 
-    starts_with("Q18_")
+    starts_with("Q20_")
   ) %>% 
   #change class to numeric for all columns that start with "Q9_"
-  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.))))
+  mutate_at(vars(starts_with("Q20_")), funs(as.numeric(as.character(.))))
 
 #how many questions are asked
 n <- (ncol(pre_community) - 1)
@@ -1286,12 +1286,91 @@ print(n)
 if(n >= ncol(pre_community))stop("Check n")
 
 #calculate the mean score per participant
-pre_community$average <- round(rowMeans(pre_community[grep('^Q18_', names(pre_community))]), digits = 2)
+pre_community$average <- round(rowMeans(pre_community[grep('^Q20_', names(pre_community))]), digits = 2)
 
 print(pre_community)
 
 pre_community_mean_avg <- round(mean(pre_community$average), digits = 2)
 print(pre_community_mean_avg)
+```
+
+```{r post_community}
+post_community <- post_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q20_")
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with("Q20_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with "Q20_"
+  mutate_at(vars(starts_with("Q20_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(post_community) - 1)
+print(n)
+
+#calculate the mean score per participant
+post_community$average <- round(rowMeans(post_community[grep('^Q20_', names(post_community))]), digits = 2)
+
+print(post_community)
+
+post_community_mean_avg <- mean(post_community$average)
+print(post_community_mean_avg)
+```
+
+```{r follow_up_community}
+follow_up_community <- follow_up_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q20_")
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with("Q20_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with "Q20_"
+  mutate_at(vars(starts_with("Q20_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(follow_up_community) - 1)
+print(n)
+
+#calculate the mean score per participant
+follow_up_community$average <- round(rowMeans(follow_up_community[grep('^Q20_', names(follow_up_community))]), digits = 2)
+
+print(follow_up_community)
+
+follow_up_community_mean_avg <- mean(follow_up_community$avg)
+print(follow_up_community_mean_avg)
+```
+
+```{r mean_average_summary}
+# R program to illustrate 
+# data frame from vector 
+
+#how many surveys to summarize
+Survey <- c("Pre-Survey", 
+            "Post-Survey", 
+            "Follow-Up") 
+
+#how many participants per survey ?
+Participants <- c(nrow(pre_community), 
+            nrow(post_community),
+            nrow(follow_up_community)) 
+
+#mean average score per week
+MeanAverage <- c(pre_community_mean_avg, 
+                 NA, 
+                 follow_up_community_mean_avg)
+
+Average <- c(NA, 
+             post_community$average,
+             follow_up_community$average)
+
+#create the data frame 
+class.df <- data.frame(Survey,
+                      Participants,
+                      MeanAverage,
+                      Average) 
+print(class.df)
 ```
 
 ##Radical Hope
@@ -1349,6 +1428,32 @@ print(post_hope)
 
 post_hope_mean_avg <- mean(post_hope$average)
 print(post_hope_mean_avg)
+```
+
+What numeric values correspond with the text answers ?
+
+```{r follow_up_community}
+follow_up_community <- follow_up_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q21_")
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with("Q21_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with "Q21_"
+  mutate_at(vars(starts_with("Q21_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(follow_up_community) - 1)
+print(n)
+
+#calculate the mean score per participant
+follow_up_community$average <- round(rowMeans(follow_up_community[grep('^Q21_', names(follow_up_community))]), digits = 2)
+
+print(follow_up_community)
+
+follow_up_community_mean_avg <- mean(follow_up_community$avg)
+print(follow_up_community_mean_avg)
 ```
 
 ##Empowerment
