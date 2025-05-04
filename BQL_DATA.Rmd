@@ -997,10 +997,113 @@ class.df <- data.frame(Survey,
 print(class.df)
 ```
 
+#Black Identity
 
+Q11 questions
 
+H1c: Participants were hypothesized to report higher scores on the Black Identity Development Scale at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was 3.38 (n=3); at post-test, the  average was 3.52 (n=1); and at follow-up, the  average score was 3.48 (n=1), suggesting... 
 
-H1c: Participants were hypothesized to report higher scores on the Black Identity Development Scale at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting... 
+```{r pre_black}
+pre_black <- pre_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q11_")
+  ) %>% 
+  #change class to numeric for all columns that start with "Q9_"
+  mutate_at(vars(starts_with("Q11_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(pre_black) - 1)
+print(n)
+if(n >= ncol(pre_black))stop("Check n")
+
+#calculate the mean score per participant
+pre_black$average <- round(rowMeans(pre_black[grep('^Q11_', names(pre_black))]), digits = 2)
+
+print(pre_black)
+
+pre_black_mean_avg <- round(mean(pre_black$average), digits = 2)
+print(pre_black_mean_avg)
+```
+
+```{r post_black}
+post_black <- post_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q11_")
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with("Q11_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with "Q11_"
+  mutate_at(vars(starts_with("Q11_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(post_black) - 1)
+print(n)
+
+#calculate the mean score per participant
+post_black$average <- round(rowMeans(post_black[grep('^Q11_', names(post_black))]), digits = 2)
+
+print(post_black)
+
+post_black_mean_avg <- mean(post_black$average)
+print(post_black_mean_avg)
+```
+
+```{r follow_up_black}
+follow_up_black <- follow_up_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q11_")
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with("Q11_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with "Q11_"
+  mutate_at(vars(starts_with("Q11_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(follow_up_black) - 1)
+print(n)
+
+#calculate the mean score per participant
+follow_up_black$average <- round(rowMeans(follow_up_black[grep('^Q11_', names(follow_up_black))]), digits = 2)
+
+print(follow_up_black)
+
+follow_up_black_mean_avg <- mean(follow_up_black$avg)
+print(follow_up_black_mean_avg)
+```
+
+```{r mean_average_summary}
+# R program to illustrate 
+# data frame from vector 
+
+#how many surveys to summarize
+Survey <- c("Pre-Survey", 
+            "Post-Survey", 
+            "Follow-Up") 
+
+#how many participants per survey ?
+Participants <- c(nrow(pre_black), 
+            nrow(post_black),
+            nrow(follow_up_black)) 
+
+#mean average score per week
+MeanAverage <- c(pre_black_mean_avg, 
+                 NA, 
+                 follow_up_black_mean_avg)
+
+Average <- c(NA, 
+             post_black$average,
+             follow_up_black$average)
+
+#create the data frame 
+class.df <- data.frame(Survey,
+                      Participants,
+                      MeanAverage,
+                      Average) 
+print(class.df)
+```
 
 H1d: Participants were hypothesized to report higher scores on the LGBT Positive Identity Measure at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting… 
 
