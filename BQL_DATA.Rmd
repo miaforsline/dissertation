@@ -1105,14 +1105,357 @@ class.df <- data.frame(Survey,
 print(class.df)
 ```
 
+## LGBT Identity 
+
+All Q12 questions
+
 H1d: Participants were hypothesized to report higher scores on the LGBT Positive Identity Measure at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting… 
 
-H1e: Participants were hypothesized to report greater self-compassion at post-test and follow-up compared to pre-test, as measured by the Self-Compassion Scale. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting... 
+```{r pre_lgbt}
+pre_lgbt <- pre_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("QID12_")
+  ) %>% 
+  #change class to numeric for all columns that start with "Q9_"
+  mutate_at(vars(starts_with("QID12_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(pre_lgbt) - 1)
+print(n)
+if(n >= ncol(pre_lgbt))stop("Check n")
+
+#calculate the mean score per participant
+pre_lgbt$average <- round(rowMeans(pre_lgbt[grep('^QID12_', names(pre_lgbt))]), digits = 2)
+
+print(pre_lgbt)
+
+pre_lgbt_mean_avg <- round(mean(pre_lgbt$average), digits = 2)
+print(pre_lgbt_mean_avg)
+```
+
+No numeric values in LGBT scale answers for Post-Survey
+
+```{r post_lgbt}
+post_lgbt <- post_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("QID12_")
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with("QID12_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with "QID12_"
+  mutate_at(vars(starts_with("QID12_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(post_lgbt) - 1)
+print(n)
+
+#calculate the mean score per participant
+post_lgbt$average <- round(rowMeans(post_lgbt[grep('^QID12_', names(post_lgbt))]), digits = 2)
+
+print(post_lgbt)
+
+post_lgbt_mean_avg <- mean(post_lgbt$average)
+print(post_lgbt_mean_avg)
+```
+
+##Critical Consciousness
 
 H1f: Participants were hypothesized to report increased scores on the Short Critical Consciousness Scale and the Contemporary Critical Consciousness Measures I and II at post-test and follow-up compared to pre-test. Descriptive analysis showed that pre-test mean scores for each scale were ##, ##, and ## respectively, post-test scores were ##, ##, and ##, and follow-up scores were ##, ##, and ##, suggesting... 
 
+```{r pre_consciousness}
+pre_consciousness <- pre_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q18_")
+  ) %>% 
+  #change class to numeric for all columns that start with "Q9_"
+  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(pre_consciousness) - 1)
+print(n)
+if(n >= ncol(pre_consciousness))stop("Check n")
+
+#calculate the mean score per participant
+pre_consciousness$average <- round(rowMeans(pre_consciousness[grep('^Q18_', names(pre_consciousness))]), digits = 2)
+
+print(pre_consciousness)
+
+pre_consciousness_mean_avg <- round(mean(pre_consciousness$average), digits = 2)
+print(pre_consciousness_mean_avg)
+```
+
+```{r post_consciousness}
+post_consciousness <- post_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q18_")
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with("Q18_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with "Q18_"
+  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(post_consciousness) - 1)
+print(n)
+
+#calculate the mean score per participant
+post_consciousness$average <- round(rowMeans(post_consciousness[grep('^Q18_', names(post_consciousness))]), digits = 2)
+
+print(post_consciousness)
+
+post_consciousness_mean_avg <- mean(post_consciousness$average)
+print(post_consciousness_mean_avg)
+```
+
+```{r follow_up_consciousness}
+follow_up_consciousness <- follow_up_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q18_")
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with("Q18_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with "Q18_"
+  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(follow_up_consciousness) - 1)
+print(n)
+
+#calculate the mean score per participant
+follow_up_consciousness$average <- round(rowMeans(follow_up_consciousness[grep('^Q18_', names(follow_up_consciousness))]), digits = 2)
+
+print(follow_up_consciousness)
+
+follow_up_consciousness_mean_avg <- mean(follow_up_consciousness$avg)
+print(follow_up_consciousness_mean_avg)
+```
+
+```{r mean_average_summary}
+# R program to illustrate 
+# data frame from vector 
+
+#how many surveys to summarize
+Survey <- c("Pre-Survey", 
+            "Post-Survey", 
+            "Follow-Up") 
+
+#how many participants per survey ?
+Participants <- c(nrow(pre_consciousness), 
+            nrow(post_consciousness),
+            nrow(follow_up_consciousness)) 
+
+#mean average score per week
+MeanAverage <- c(pre_consciousness_mean_avg, 
+                 NA, 
+                 follow_up_consciousness_mean_avg)
+
+Average <- c(NA, 
+             post_consciousness$average,
+             follow_up_consciousness$average)
+
+#create the data frame 
+class.df <- data.frame(Survey,
+                      Participants,
+                      MeanAverage,
+                      Average) 
+print(class.df)
+```
+##Community Self-Esteem
+
+All Q20 questions
+
 H1g: Participants were hypothesized to report higher scores on the Collective Self-Esteem Scale at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting... 
+
+```{r pre_community}
+pre_community <- pre_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q18_")
+  ) %>% 
+  #change class to numeric for all columns that start with "Q9_"
+  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(pre_community) - 1)
+print(n)
+if(n >= ncol(pre_community))stop("Check n")
+
+#calculate the mean score per participant
+pre_community$average <- round(rowMeans(pre_community[grep('^Q18_', names(pre_community))]), digits = 2)
+
+print(pre_community)
+
+pre_community_mean_avg <- round(mean(pre_community$average), digits = 2)
+print(pre_community_mean_avg)
+```
+
+##Radical Hope
+
+All Q21 questions
 
 H1h: Participants were hypothesized to report increased Radical Hope from pre- to post-test and follow-up. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting... 
 
+```{r pre_hope}
+pre_hope <- pre_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q21_")
+  ) %>% 
+  #change class to numeric for all columns that start with "Q9_"
+  mutate_at(vars(starts_with("Q21_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(pre_hope) - 1)
+print(n)
+if(n >= ncol(pre_hope))stop("Check n")
+
+#calculate the mean score per participant
+pre_hope$average <- round(rowMeans(pre_hope[grep('^Q21_', names(pre_hope))]), digits = 2)
+
+print(pre_hope)
+
+pre_hope_mean_avg <- round(mean(pre_hope$average), digits = 2)
+print(pre_hope_mean_avg)
+```
+
+No numeric values 
+
+What number is Very Much ? 
+
+```{r post_hope}
+post_hope <- post_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q21_")
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with("Q21_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with "Q21_"
+  mutate_at(vars(starts_with("Q21_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(post_hope) - 1)
+print(n)
+
+#calculate the mean score per participant
+post_hope$average <- round(rowMeans(post_hope[grep('^Q21_', names(post_hope))]), digits = 2)
+
+print(post_hope)
+
+post_hope_mean_avg <- mean(post_hope$average)
+print(post_hope_mean_avg)
+```
+
+##Empowerment
+
+All Q23 questions 
+
 H1i: Participants were hypothesized to report higher scores on the Individual-Community Related Empowerment Measure at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting... 
+
+```{r pre_empowerment}
+pre_empowerment <- pre_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q23_")
+  ) %>% 
+  #change class to numeric for all columns that start with "Q9_"
+  mutate_at(vars(starts_with("Q23_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(pre_empowerment) - 1)
+print(n)
+if(n >= ncol(pre_empowerment))stop("Check n")
+
+#calculate the mean score per participant
+pre_empowerment$average <- round(rowMeans(pre_empowerment[grep('^Q23_', names(pre_empowerment))]), digits = 2)
+
+print(pre_empowerment)
+
+pre_empowerment_mean_avg <- round(mean(pre_empowerment$average), digits = 2)
+print(pre_empowerment_mean_avg)
+```
+
+```{r post_empowerment}
+post_empowerment <- post_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q23_")
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with("Q23_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with "Q23_"
+  mutate_at(vars(starts_with("Q23_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(post_empowerment) - 1)
+print(n)
+
+#calculate the mean score per participant
+post_empowerment$average <- round(rowMeans(post_empowerment[grep('^Q23_', names(post_empowerment))]), digits = 2)
+
+print(post_empowerment)
+
+post_empowerment_mean_avg <- mean(post_empowerment$average)
+print(post_empowerment_mean_avg)
+```
+
+```{r follow_up_empowerment}
+follow_up_empowerment <- follow_up_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q23_")
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with("Q23_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with "Q23_"
+  mutate_at(vars(starts_with("Q23_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(follow_up_empowerment) - 1)
+print(n)
+
+#calculate the mean score per participant
+follow_up_empowerment$average <- round(rowMeans(follow_up_empowerment[grep('^Q23_', names(follow_up_empowerment))]), digits = 2)
+
+print(follow_up_empowerment)
+
+follow_up_empowerment_mean_avg <- mean(follow_up_empowerment$avg)
+print(follow_up_empowerment_mean_avg)
+```
+
+```{r mean_average_summary}
+# R program to illustrate 
+# data frame from vector 
+
+#how many surveys to summarize
+Survey <- c("Pre-Survey", 
+            "Post-Survey", 
+            "Follow-Up") 
+
+#how many participants per survey ?
+Participants <- c(nrow(pre_empowerment), 
+            nrow(post_empowerment),
+            nrow(follow_up_empowerment)) 
+
+#mean average score per week
+MeanAverage <- c(pre_empowerment_mean_avg, 
+                 NA, 
+                 follow_up_empowerment_mean_avg)
+
+Average <- c(NA, 
+             post_empowerment$average,
+             follow_up_empowerment$average)
+
+#create the data frame 
+class.df <- data.frame(Survey,
+                      Participants,
+                      MeanAverage,
+                      Average) 
+print(class.df)
+```
+
