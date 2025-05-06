@@ -1,6 +1,6 @@
 # A mixed-methods evaluation for a Community-Based mental health intervention for Black Queer Young Adults
 
-## Authors: [Jacquelyn Chin]([https://github.com/jchin333](https://www.linkedin.com/in/jacquelynchin/) and [Mia Forsline](https://www.linkedin.com/in/mia-forsline/)
+## Authors: [Jacquelyn Chin](https://www.linkedin.com/in/jacquelynchin/) and [Mia Forsline](https://www.linkedin.com/in/mia-forsline/)
 
 ## Project Advisor: [Dr. Tania Israel](https://taniaisrael.com/) 
 
