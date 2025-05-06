@@ -38,7 +38,17 @@ Next, we calculated the mean average scores and average scores for 8 psychology 
 7. Radical Hope
 8. Individual-Community Related Empowerment Measure
 
-For the PHQ-4 Anxiety & Depresion Scale, we compared participants' response scores at the pre-survey, Week 2, Week 4, Week 6, and the follow-up survey. For all other scales/measures, we compared participants' response scores at the pre-survey, post-survey, and follow-up survey. 
+For the PHQ-4 Anxiety & Depresion Scale, we compared participants' response scores at: 
+- the pre-survey,
+- Week 2,
+- Week 4,
+- Week 6,
+- and the follow-up survey.
+
+For all other scales/measures, we compared participants' response scores at: 
+- the pre-survey,
+- post-survey,
+- and follow-up survey. 
 
 For surveys with multiple participants, we calculated the mean average score for each scale/measure. For surveys with only one participant, we calculated the average score for each scale/measure. 
 
