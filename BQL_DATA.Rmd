@@ -204,43 +204,48 @@ filename <- list.files(path = filepath, pattern = "BQL Master Codebook.xlsx") #w
 print(filename) #check which file we have selected
 #print function means 'show me what is in this file'
 
-#read_excel() reads in Excel files
-codebook_demographics <- read_excel(path = here(filepath, filename[1]), sheet = 1) %>% 
+#4 columns
+codebook_demographics <- read_excel(path = here(filepath, filename[1]), sheet = "Demographics") %>% 
   mutate("Source Construct" = NA,
          "Reverse" = NA,
          "New Value" = NA)
-codebook_anxiety <- read_excel(path = here(filepath, filename[1]), sheet = 2) %>%
+codebook_black <- read_excel(path = here(filepath, filename[1]), sheet = "Black Identity") %>% 
+  mutate("Source Construct" = NA,
+         "Reverse" = NA,
+         "New Value" = NA)
+codebook_lgbt <- read_excel(path = here(filepath, filename[1]), sheet = "LGBTQIA+ Identity Scale") %>% 
+  mutate("Source Construct" = NA,
+         "Reverse" = NA,
+         "New Value" = NA)
+codebook_action <- read_excel(path = here(filepath, filename[1]), sheet = "Critical Action") %>% 
+  mutate("Source Construct" = NA,
+         "Reverse" = NA,
+         "New Value" = NA)
+codebook_hope <- read_excel(path = here(filepath, filename[1]), sheet = "Radical Hope") %>% 
+  mutate("Source Construct" = NA,
+         "Reverse" = NA,
+         "New Value" = NA)
+codebook_empowerment <- read_excel(path = here(filepath, filename[1]), sheet = "Empowerment") %>% 
+  mutate("Source Construct" = NA,
+         "Reverse" = NA,
+         "New Value" = NA)
+
+#source construct = 5 columns
+codebook_anxiety <- read_excel(path = here(filepath, filename[1]), sheet = "PHQ-4 Anxiety Depression") %>%
   mutate() %>% 
   mutate("Reverse" = "NA",
          "New Value" = "NA")
-codebook_consciousness <- read_excel(path = here(filepath, filename[1]), sheet = 3) %>% 
+codebook_ryff <- read_excel(path = here(filepath, filename[1]), sheet = "Ryff Wellbeing") %>% 
+  mutate("Reverse" = NA,
+         "New Value" = NA)
+
+#reverse-coding = 6 columns
+codebook_consciousness <- read_excel(path = here(filepath, filename[1]), sheet = "Critical Consciousness") %>% 
   mutate("Source Construct" = NA)
-codebook_ryff <- read_excel(path = here(filepath, filename[1]), sheet = 4) %>% 
-  mutate("Source Construct" = NA, 
-         "Reverse" = NA,
-         "New Value" = NA)
-codebook_black <- read_excel(path = here(filepath, filename[1]), sheet = 5) %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
-codebook_lgbt <- read_excel(path = here(filepath, filename[1]), sheet = 6) %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
-codebook_action <- read_excel(path = here(filepath, filename[1]), sheet = 7) %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
-codebook_community <- read_excel(path = here(filepath, filename[1]), sheet = 8) %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
-codebook_hope <- read_excel(path = here(filepath, filename[1]), sheet = 9) %>% 
+codebook_community <- read_excel(path = here(filepath, filename[1]), sheet = "Collective Self-Esteem") %>% 
   mutate("Source Construct" = NA)
-codebook_empowerment <- read_excel(path = here(filepath, filename[1]), sheet = 10) %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
+
+
 
 codebook <- rbind(
   codebook_demographics,
@@ -263,7 +268,8 @@ Then we will look at what participants answered when asked about:
 ```{r race_ethnicity}
 race_ethnicity <- pre_survey_clean %>% 
   select(Q1,
-         Q36) %>% 
+         Q36,
+         Q36_11_TEXT) %>% 
   pivot_longer(
     cols = !Q1, 
     names_to = "Variable Name",
@@ -277,7 +283,7 @@ race_ethnicity_description <- left_join(x = race_ethnicity, y = codebook) %>%
   select(-"Source Construct") %>% 
   mutate("Question Text" = "Race") 
 
-race_ethnicity_description$Label[!is.na(race_ethnicity_description$Value) & is.na(race_ethnicity_description$Label)] <- race_ethnicity_description$Value
+#race_ethnicity_description$Label[race_ethnicity_description$Q1 == "Q36_11_TEXT"] <- race_ethnicity_description$Value[7]
 
 race_ethnicity_summary <- race_ethnicity_description %>% 
   group_by(Label) %>% 
