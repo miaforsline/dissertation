@@ -233,8 +233,8 @@ codebook_empowerment <- read_excel(path = here(filepath, filename[1]), sheet = "
 #source construct = 5 columns
 codebook_anxiety <- read_excel(path = here(filepath, filename[1]), sheet = "PHQ-4 Anxiety Depression") %>%
   mutate() %>% 
-  mutate("Reverse" = "NA",
-         "New Value" = "NA")
+  mutate("Reverse" = NA,
+         "New Value" = NA)
 codebook_ryff <- read_excel(path = here(filepath, filename[1]), sheet = "Ryff Wellbeing") %>% 
   mutate("Reverse" = NA,
          "New Value" = NA)
@@ -258,7 +258,10 @@ codebook <- rbind(
   codebook_community,
   codebook_hope,
   codebook_empowerment
-)
+) %>% 
+  rename(NewValue = "New Value") %>% 
+  #if_else() must work with characters
+  mutate(CombinedValues = if_else(is.na(NewValue), Value, as.character(NewValue)))
 ```
 
 
@@ -1245,6 +1248,8 @@ print(class.df)
 
 H1f: Participants were hypothesized to report increased scores on the Short Critical Consciousness Scale and the Contemporary Critical Consciousness Measures I and II at post-test and follow-up compared to pre-test. Descriptive analysis showed that pre-test mean scores for each scale were ##, ##, and ## respectively, post-test scores were ##, ##, and ##, and follow-up scores were ##, ##, and ##, suggesting... 
 
+Contains Reverse Coding 
+
 ```{r pre_consciousness}
 pre_consciousness <- pre_survey_clean %>% 
   select(
@@ -1252,7 +1257,42 @@ pre_consciousness <- pre_survey_clean %>%
     starts_with("Q18_")
   ) %>% 
   #change class to numeric for all columns that start with "Q9_"
-  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.))))
+  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) %>% 
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+#pull out the reverse 
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  )
+
+#join the survey data to the codebook 
+pre_consciousness_codebook <- left_join(x = pre_consciousness, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+pre_consciousness <- pre_consciousness_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
+  )
 
 #how many questions are asked
 n <- (ncol(pre_consciousness) - 1)
@@ -1277,7 +1317,44 @@ post_consciousness <- post_survey_clean %>%
   #keep only numeric values
   mutate(across(starts_with("Q18_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
   #change class to numeric for all columns that start with "Q18_"
-  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.))))
+  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) %>% 
+  #change class to numeric for all columns that start with "Q9_"
+  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) %>% 
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+#pull out the reverse 
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  )
+
+#join the survey data to the codebook 
+post_consciousness_codebook <- left_join(x = post_consciousness, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+post_consciousness <- post_consciousness_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
+  )
 
 #how many questions are asked
 n <- (ncol(post_consciousness) - 1)
@@ -1301,7 +1378,42 @@ follow_up_consciousness <- follow_up_clean %>%
   #keep only numeric values
   mutate(across(starts_with("Q18_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
   #change class to numeric for all columns that start with "Q18_"
-  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.))))
+  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.))))%>% 
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+#pull out the reverse 
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  )
+
+#join the survey data to the codebook 
+follow_up_consciousness_codebook <- left_join(x = follow_up_consciousness, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+follow_up_consciousness <- follow_up_consciousness_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
+  )
 
 #how many questions are asked
 n <- (ncol(follow_up_consciousness) - 1)
@@ -1348,9 +1460,11 @@ print(class.df)
 ```
 ##Community Self-Esteem
 
-All Q20 questions
+All Q20 and Q57 questions
 
 H1g: Participants were hypothesized to report higher scores on the Collective Self-Esteem Scale at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting... 
+
+Contains reverse coding
 
 ```{r pre_community}
 pre_community <- pre_survey_clean %>% 
