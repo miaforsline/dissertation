@@ -283,9 +283,14 @@ race_ethnicity_description <- left_join(x = race_ethnicity, y = codebook) %>%
   select(-"Source Construct") %>% 
   mutate("Question Text" = "Race") 
 
-#race_ethnicity_description$Label[race_ethnicity_description$Q1 == "Q36_11_TEXT"] <- race_ethnicity_description$Value[7]
+##add Creole as an option 
+race_ethnicity_description$Label[race_ethnicity_description$Q1 == "LAS" & race_ethnicity_description$Value == "Creole"] <- "Creole"
 
 race_ethnicity_summary <- race_ethnicity_description %>% 
+  #remove Another race...
+  filter(
+    Label != "Another race/ethnicity (please specify)"
+  ) %>% 
   group_by(Label) %>% 
   summarise(
     Label = Label, 
