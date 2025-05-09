@@ -707,7 +707,7 @@ political_action_summary$n[political_action_summary$Label == "Total"] <- length(
 print(political_action_summary)
 ```
 
-# Scales
+# RQ 1: Scales
 
 TASK FOR JACKIE: Double-check that descriptions are correct for analysis
 
@@ -829,30 +829,29 @@ print(week4_anxiety_mean_avg)
 
 ```{r week6_anxiety}
 week6_anxiety <- week6_clean %>% 
-  clean_names() %>% 
   select(
-    q1, 
-    phq_4_1,
-    phq_4_2,
-    phq_4_3,
-    phq_4_4
+    Q1, 
+    Q8_1,
+    Q8_2,
+    Q8_3,
+    Q8_4
   ) %>% 
   
   #keep only the first digit in each column 
-  mutate(phq_4_1 = gsub("(^\\d{1}).*", "\\1", phq_4_1),
-         phq_4_2 = gsub("(^\\d{1}).*", "\\1", phq_4_2),
-         phq_4_3 = gsub("(^\\d{1}).*", "\\1", phq_4_3),
-         phq_4_4 = gsub("(^\\d{1}).*", "\\1", phq_4_4)) %>% 
+  mutate(Q8_1 = gsub("(^\\d{1}).*", "\\1", Q8_1),
+         Q8_2 = gsub("(^\\d{1}).*", "\\1", Q8_2),
+         Q8_3 = gsub("(^\\d{1}).*", "\\1", Q8_3),
+         Q8_4 = gsub("(^\\d{1}).*", "\\1", Q8_4)) %>% 
   mutate(
-    phq_4_1 = as.numeric(phq_4_1),
-    phq_4_2 = as.numeric(phq_4_2),
-    phq_4_3 = as.numeric(phq_4_3),
-    phq_4_4 = as.numeric(phq_4_4),
+    Q8_1 = as.numeric(Q8_1),
+    Q8_2 = as.numeric(Q8_2),
+    Q8_3 = as.numeric(Q8_3),
+    Q8_4 = as.numeric(Q8_4),
   )
 
 n <- (ncol(week6_anxiety) - 1)
 
-week6_anxiety$average <- (week6_anxiety$phq_4_1 + week6_anxiety$phq_4_2 + week6_anxiety$phq_4_3 + week6_anxiety$phq_4_4) / n
+week6_anxiety$average <- (week6_anxiety$Q8_1 + week6_anxiety$Q8_2 + week6_anxiety$Q8_3 + week6_anxiety$Q8_4) / n
 
 print(week6_anxiety)
 ```
@@ -1162,7 +1161,6 @@ pre_lgbt_mean_avg <- round(mean(pre_lgbt$average), digits = 2)
 print(pre_lgbt_mean_avg)
 ```
 
-No numeric values in LGBT scale answers for Post-Survey
 
 ```{r post_lgbt}
 post_lgbt <- post_survey_clean %>% 
@@ -1186,6 +1184,61 @@ print(post_lgbt)
 
 post_lgbt_mean_avg <- mean(post_lgbt$average)
 print(post_lgbt_mean_avg)
+```
+
+```{r follow_up_lgbt}
+follow_up_lgbt <- follow_up_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q11_")
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with("Q11_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with "Q11_"
+  mutate_at(vars(starts_with("Q11_")), funs(as.numeric(as.character(.))))
+
+#how many questions are asked
+n <- (ncol(follow_up_lgbt) - 1)
+print(n)
+
+#calculate the mean score per participant
+follow_up_lgbt$average <- round(rowMeans(follow_up_lgbt[grep('^Q11_', names(follow_up_lgbt))]), digits = 2)
+
+print(follow_up_lgbt)
+
+follow_up_lgbt_mean_avg <- mean(follow_up_lgbt$avg)
+print(follow_up_lgbt_mean_avg)
+```
+
+```{r mean_average_summary}
+# R program to illustrate 
+# data frame from vector 
+
+#how many surveys to summarize
+Survey <- c("Pre-Survey", 
+            "Post-Survey", 
+            "Follow-Up") 
+
+#how many participants per survey ?
+Participants <- c(nrow(pre_lgbt), 
+            nrow(post_lgbt),
+            nrow(follow_up_lgbt)) 
+
+#mean average score per week
+MeanAverage <- c(pre_lgbt_mean_avg, 
+                 NA, 
+                 follow_up_lgbt_mean_avg)
+
+Average <- c(NA, 
+             post_lgbt$average,
+             follow_up_lgbt$average)
+
+#create the data frame 
+class.df <- data.frame(Survey,
+                      Participants,
+                      MeanAverage,
+                      Average) 
+print(class.df)
 ```
 
 ##Critical Consciousness
@@ -1458,10 +1511,10 @@ post_hope_mean_avg <- mean(post_hope$average)
 print(post_hope_mean_avg)
 ```
 
-What numeric values correspond with the text answers ?
 
-```{r follow_up_community}
-follow_up_community <- follow_up_clean %>% 
+
+```{r follow_up_hope}
+follow_up_hope <- follow_up_clean %>% 
   select(
     Q1, 
     starts_with("Q21_")
@@ -1472,16 +1525,47 @@ follow_up_community <- follow_up_clean %>%
   mutate_at(vars(starts_with("Q21_")), funs(as.numeric(as.character(.))))
 
 #how many questions are asked
-n <- (ncol(follow_up_community) - 1)
+n <- (ncol(follow_up_hope) - 1)
 print(n)
 
 #calculate the mean score per participant
-follow_up_community$average <- round(rowMeans(follow_up_community[grep('^Q21_', names(follow_up_community))]), digits = 2)
+follow_up_hope$average <- round(rowMeans(follow_up_hope[grep('^Q21_', names(follow_up_hope))]), digits = 2)
 
-print(follow_up_community)
+print(follow_up_hope)
 
-follow_up_community_mean_avg <- mean(follow_up_community$avg)
-print(follow_up_community_mean_avg)
+follow_up_hope_mean_avg <- mean(follow_up_hope$avg)
+print(follow_up_hope_mean_avg)
+```
+
+```{r mean_average_summary}
+# R program to illustrate 
+# data frame from vector 
+
+#how many surveys to summarize
+Survey <- c("Pre-Survey", 
+            "Post-Survey", 
+            "Follow-Up") 
+
+#how many participants per survey ?
+Participants <- c(nrow(pre_hope), 
+            nrow(post_hope),
+            nrow(follow_up_hope)) 
+
+#mean average score per week
+MeanAverage <- c(pre_hope_mean_avg, 
+                 NA, 
+                 follow_up_hope_mean_avg)
+
+Average <- c(NA, 
+             post_hope$average,
+             follow_up_hope$average)
+
+#create the data frame 
+class.df <- data.frame(Survey,
+                      Participants,
+                      MeanAverage,
+                      Average) 
+print(class.df)
 ```
 
 ##Empowerment
