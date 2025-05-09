@@ -1258,6 +1258,7 @@ pre_consciousness <- pre_survey_clean %>%
   ) %>% 
   #change class to numeric for all columns that start with "Q9_"
   mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) %>% 
+  #format long data to join to codebook
   pivot_longer(cols = !Q1,
                names_to = "Variable Name",
                values_to = "Value")
@@ -1318,8 +1319,6 @@ post_consciousness <- post_survey_clean %>%
   mutate(across(starts_with("Q18_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
   #change class to numeric for all columns that start with "Q18_"
   mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) %>% 
-  #change class to numeric for all columns that start with "Q9_"
-  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) %>% 
   pivot_longer(cols = !Q1,
                names_to = "Variable Name",
                values_to = "Value")
@@ -1378,7 +1377,7 @@ follow_up_consciousness <- follow_up_clean %>%
   #keep only numeric values
   mutate(across(starts_with("Q18_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
   #change class to numeric for all columns that start with "Q18_"
-  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.))))%>% 
+  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) %>% 
   pivot_longer(cols = !Q1,
                names_to = "Variable Name",
                values_to = "Value")
@@ -1473,7 +1472,43 @@ pre_community <- pre_survey_clean %>%
     starts_with("Q20_")
   ) %>% 
   #change class to numeric for all columns that start with "Q9_"
-  mutate_at(vars(starts_with("Q20_")), funs(as.numeric(as.character(.))))
+  mutate_at(vars(starts_with("Q20_")), funs(as.numeric(as.character(.)))) %>% 
+  #format long data to join to codebook
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+#pull out the reverse 
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  )
+
+#join the survey data to the codebook 
+pre_community_codebook <- left_join(x = pre_community, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+pre_community <- pre_community_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
+  )
 
 #how many questions are asked
 n <- (ncol(pre_community) - 1)
@@ -1498,7 +1533,43 @@ post_community <- post_survey_clean %>%
   #keep only numeric values
   mutate(across(starts_with("Q20_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
   #change class to numeric for all columns that start with "Q20_"
-  mutate_at(vars(starts_with("Q20_")), funs(as.numeric(as.character(.))))
+  mutate_at(vars(starts_with("Q20_")), funs(as.numeric(as.character(.)))) %>% 
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+#pull out the reverse 
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  )
+
+#join the survey data to the codebook 
+##check that the values have changed
+post_community_codebook <- left_join(x = post_community, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+post_community <- post_community_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
+  )
 
 #how many questions are asked
 n <- (ncol(post_community) - 1)
@@ -1522,7 +1593,42 @@ follow_up_community <- follow_up_clean %>%
   #keep only numeric values
   mutate(across(starts_with("Q20_"), ~ gsub("[^0-9.-]+", "", .))) %>% 
   #change class to numeric for all columns that start with "Q20_"
-  mutate_at(vars(starts_with("Q20_")), funs(as.numeric(as.character(.))))
+  mutate_at(vars(starts_with("Q20_")), funs(as.numeric(as.character(.)))) %>% 
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+#pull out the reverse 
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  )
+
+#join the survey data to the codebook 
+follow_up_community_codebook <- left_join(x = follow_up_community, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+follow_up_community <- follow_up_community_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
+  )
 
 #how many questions are asked
 n <- (ncol(follow_up_community) - 1)
