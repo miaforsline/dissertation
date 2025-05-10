@@ -151,3 +151,89 @@ follow_up_clean <- follow_up %>%
     Q1 == "TOR"
   )
 ```
+
+#Week 1: Radical Healing
+
+#Week 2: Critical Consciousness
+
+n = 3
+
+##Item 1
+
+Q18_1
+
+```{r}
+pre_item1 <- pre_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q9_")
+  ) %>% 
+  #change class to numeric for all columns that start with "Q9_"
+  mutate_at(vars(starts_with("Q9_")), funs(as.numeric(as.character(.))))
+```
+
+
+##Item 10
+
+##Item 11
+
+##Item 13
+
+##Item 15
+
+##Item 16
+
+##Item 17
+
+##Item 18
+
+##Item 20
+
+#Week 3: Radical Hope
+
+n = 3
+
+##Item 1
+
+##Item 2
+
+##Item 3
+
+##Item 4
+
+##Item 5
+
+##Item 6
+
+#Week 4: Emotional & Social Support
+
+##Item 12
+
+##Item 3
+
+#Week 5: Strength & Resistance 
+
+##Item 4
+
+##Item 5
+
+##Item 6
+
+##Item 7
+
+#Post-Test: Self & Cultural Authenticity
+
+##Item 4
+
+##Item 8
+
+##Item 10
+
+##Item 12
+
+##Item 14
+
+##Item 16
+
+
+
