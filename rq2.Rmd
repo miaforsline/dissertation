@@ -1,0 +1,153 @@
+---
+title: "RQ2"
+author: "Jackie & Mia"
+date: "2025-05-10"
+output: html_document
+---
+
+# Objective
+
+To complete Research Question 2
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE
+)
+options(knitr.duplicate.label = "allow",
+        scipen = 999)
+
+#install packages if necessary, then load libraries
+if (!require(librarian)){
+  install.packages("librarian")
+  library(librarian)
+}
+librarian::shelf(
+  #expss, #to make tables
+  here, #to build file paths
+  janitor, #for column name cleaning
+  lubridate, #for working with dates 
+  readxl, #read in Excel files
+  stringr, #to clean data 
+  tidyr, #data cleaning
+  tidyverse, #general data cleaning functions and collection of common packages
+  dplyr, #case_match
+  writexl #save Excel files
+  )
+```
+
+# Read in Survey Data
+- The raw Excel data was exported from Qualtrics 
+
+First, create an R chunk: Command + option + I makes a code chunk appear on the Mac
+
+Note: you can run an entire R code chunk by pressing the green arrow button OR using Shift + Command + Return on a Mac 
+
+```{r read_in_data}
+#filepath & here function takes everything in green & helps R locate the correct file path
+filepath <- here("../")
+#"../" means one file outside of this file
+print(filepath) #double check the filepath is correct
+#filename function tells R where the exact file is located
+
+filename <- list.files(path = filepath, pattern = "BQL Survey Data - CLEAN - FINAL.xlsx") #which file do we want to read in?
+
+print(filename) #check which file we have selected
+#print function means 'show me what is in this file'
+
+#read_excel() reads in Excel files
+pre_survey <- read_excel(path = here(filepath, filename[1]), sheet = 1) 
+week1 <- read_excel(path = here(filepath, filename[1]), sheet = 2) 
+week2 <- read_excel(path = here(filepath, filename[1]), sheet = 3)
+week3 <- read_excel(path = here(filepath, filename[1]), sheet = 4)
+week4 <- read_excel(path = here(filepath, filename[1]), sheet = 5)
+week5 <- read_excel(path = here(filepath, filename[1]), sheet = 6)
+week6 <- read_excel(path = here(filepath, filename[1]), sheet = 7)
+post_survey <- read_excel(path = here(filepath, filename[1]), sheet = 8)
+follow_up <- read_excel(path = here(filepath, filename[1]), sheet = 9)
+```
+
+# Clean the data 
+We want to drop the "dummy" participants from pre-survey results 
+- AKA we want to remove fake data based on Q1
+- Jackie indicated that there are 3 real participants: BELL, BER, and LAS
+- We will remove everyone else 
+
+Week 1 had no real data
+
+Refer to BQL Survey Data - CLEAN - FINAL to see how many real participants completed each week's survey
+
+```{r}
+#(option + minus sign) is the keyboard shortcut for the assignment arrow (<-)
+##you can also type out the assignment arrow
+
+#first, we will create a "clean" version of the data based on the original BQL_Data object
+pre_survey_clean <- pre_survey %>% 
+  #(shift + command + m) creates a pipe symbol
+  
+  #then we will filter based on column Q1
+  filter(
+    Q1 == "BELL" | Q1 == "BER" | Q1 == "LAS"
+  ) %>% 
+  
+  #then we will drop rows that have NA values in column Q4 because this row is incomplete data 
+  drop_na(Q4)
+#filter function tells Data what to pull out from the Excel sheet
+
+week2_clean <- week2 %>% 
+  mutate(
+    Q1 = toupper(Q1)
+  ) %>% 
+  filter(
+    Q1 == "BELL" | Q1 == "LAS" | Q1 == "TOR"
+  )
+
+week3_clean <- week3 %>% 
+  mutate(
+    Q1 = toupper(Q1)
+  ) %>% 
+  filter(
+    Q1 == "BAL" | Q1 == "LAS" | Q1 == "TOR"
+  )
+
+week4_clean <- week4 %>% 
+  mutate(
+    Q1 = toupper(Q1)
+  ) %>% 
+  filter(
+    Q1 == "LAS" | Q1 == "TOR"
+  )
+
+week5_clean <- week5 %>% 
+  mutate(
+    Q1 = toupper(Q1)
+  ) %>% 
+  filter(
+    Q1 == "LAS" | Q1 == "TOR"
+  )
+
+week6_clean <- week6 %>% 
+  mutate(
+    Q1 = toupper(Q1)
+  ) %>% 
+  filter(
+    Q1 == "LAS"
+  )
+
+post_survey_clean <- post_survey %>% 
+  mutate(
+    Q1 = toupper(Q1)
+  ) %>% 
+  filter(
+    Q1 == "LAS"
+  )
+
+follow_up_clean <- follow_up %>% 
+  mutate(
+    Q1 = toupper(Q1)
+  ) %>% 
+  filter(
+    Q1 == "TOR"
+  )
+```
