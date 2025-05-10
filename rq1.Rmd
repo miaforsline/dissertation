@@ -1,5 +1,5 @@
 ---
-title: "BQL Data Analysis"
+title: "BQL Data Analysis: Research Question 1"
 author: "Jackie Chin & Mia Forsline"
 date: "2025-04-11"
 output: html_document
