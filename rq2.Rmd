@@ -611,6 +611,52 @@ print(item)
 
 n = 3
 
+Pre-Survey
+
+```{r pre_week3}
+pre_week3 <- pre_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q21_")
+  ) %>% 
+  #change class to numeric for all columns that start with "Q9_"
+  mutate_at(vars(starts_with("Q21_")), funs(as.numeric(as.character(.))))
+
+#calculate each question's mean
+pre_week3_means <- pre_week3 %>% 
+  summarise_each(funs(mean( .,na.rm = TRUE)))
+
+#rename average row
+pre_week3_means$Q1[is.na(pre_week3_means$Q1)] <- "Average"
+
+#append means to original scores
+pre_week3_with_means <- rbind(pre_week3, pre_week3_means)
+
+print(pre_week3_with_means)
+```
+
+```{r pre_week3}
+post_week3 <- week3_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q21_")
+  ) %>% 
+  #change class to numeric for all columns that start with "Q9_"
+  mutate_at(vars(starts_with("Q21_")), funs(as.numeric(as.character(.))))
+
+#calculate each question's mean
+post_week3_means <- post_week3 %>% 
+  summarise_each(funs(mean( .,na.rm = TRUE)))
+
+#rename average row
+post_week3_means$Q1[is.na(post_week3_means$Q1)] <- "Average"
+
+#append means to original scores
+post_week3_with_means <- rbind(post_week3, post_week3_means)
+
+print(post_week3_with_means)
+```
+
 ##Item 1
 
 ##Item 2
