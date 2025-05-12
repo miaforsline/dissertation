@@ -277,6 +277,18 @@ pre_week2 <- pre_week2_codebook %>%
     names_from = "Variable Name",
     values_from = "Value"
   )
+
+#calculate each question's mean
+pre_week2_means <- pre_week2 %>% 
+  summarise_each(funs(mean( .,na.rm = TRUE)))
+
+#rename average row
+pre_week2_means$Q1[is.na(pre_week2_means$Q1)] <- "Average"
+
+#append means to original scores
+pre_week2_with_means <- rbind(pre_week2, pre_week2_means)
+
+print(pre_week2_with_means)
 ```
 
 Week 2
@@ -288,7 +300,7 @@ post_week2 <- week2_clean %>%
     starts_with("Q18_")
   ) %>% 
   #keep only the first digit
-  mutate(across(starts_with("Q18_"), ~ gsub("(^\\d{1}).*", "\\1", .))) %>% 
+  mutate(across(starts_with("Q18_"), ~ gsub("(^\\d{1}).*", "\\1", .))) %>%
   #change class to numeric for all columns that start with "Q9_"
   mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) %>% 
   #format long data to join to codebook
@@ -328,6 +340,18 @@ post_week2 <- post_week2_codebook %>%
     names_from = "Variable Name",
     values_from = "Value"
   )
+
+#calculate each question's mean
+post_week2_means <- post_week2 %>% 
+  summarise_each(funs(mean( .,na.rm = TRUE)))
+
+#rename average row
+post_week2_means$Q1[is.na(post_week2_means$Q1)] <- "Average"
+
+#append means to original scores
+post_week2_with_means <- rbind(post_week2, post_week2_means)
+
+print(post_week2_with_means)
 ```
 
 
@@ -335,91 +359,253 @@ post_week2 <- post_week2_codebook %>%
 
 Q18_1
 
-```{r pre_item1}
-pre_item1 <- pre_week2 %>% 
-  select(
-    Q1, 
-    Q18_1
-  ) %>%
-  group_by(Q1) %>% 
-  #calculate overall avg
-  summarize(avg = mean(Q18_1), n = n()) %>%
-  ungroup %>%
-  #adorn avg bottom row
-  bind_rows(summarize(., Q1 = "Overall Avg", 
-                         avg = sum(avg * n) / sum(n), 
-                         n = sum(n))) %>%
-  select(-n) %>% 
-  rename(pre_survey = avg)
+```{r item1}
+#pre results
+pre_item1 <- pre_week2_with_means %>% 
+  select(Q1,
+         Q18_1) %>% 
+  rename(PreSurvey = Q18_1)
 
 print(pre_item1)
-```
 
-```{r post_item1}
-post_item1 <- post_week2 %>% 
-  select(
-    Q1, 
-    Q18_1
-  ) %>%
-  group_by(Q1) %>% 
-  #calculate overall avg
-  summarize(avg = mean(Q18_1), n = n()) %>%
-  ungroup %>%
-  #adorn avg bottom row
-  bind_rows(summarize(., Q1 = "Overall Avg", 
-                         avg = sum(avg * n) / sum(n), 
-                         n = sum(n))) %>%
-  select(-n) %>% 
-  rename(post_survey = avg)
+#week 2 (AKA post) results
+post_item1 <- post_week2_with_means %>% 
+  select(Q1,
+         Q18_1) %>% 
+  rename(Week2 = Q18_1)
 
 print(post_item1)
-```
 
-Combine pre and post results
-
-```{r item1}
+#combine pre and post results
 item <- full_join(x = pre_item1, y = post_item1) %>% 
-  rename(participant = Q1)
+  rename(Participant = Q1)
 print(item)
 ```
 
 
 ##Item 10
 
-Q18_10
+Pre: Q18_10
+Week 2: Q18_2
 
-```{r pre_item10}
-pre_item10 <- pre_week2 %>% 
-  select(
-    Q1, 
-    Q18_10
-  ) %>%
-  group_by(Q1) %>% 
-  #calculate overall avg
-  summarize(avg = mean(Q18_10), n = n()) %>%
-  ungroup %>%
-  #adorn avg bottom row
-  bind_rows(summarize(., Q1 = "Overall Avg", 
-                         avg = sum(avg * n) / sum(n), 
-                         n = sum(n))) %>%
-  select(-n)
+```{r}
+#pre results
+pre_item10 <- pre_week2_with_means %>% 
+  select(Q1,
+         Q18_10) %>% 
+  rename(PreSurvey = Q18_10)
 
 print(pre_item10)
+
+#week 2 (AKA post) results
+post_item10 <- post_week2_with_means %>% 
+  select(Q1,
+         Q18_2) %>% 
+  rename(Week2 = Q18_2)
+
+print(post_item10)
+
+#combine pre and post results
+item <- full_join(x = pre_item10, y = post_item10) %>% 
+  rename(Participant = Q1)
+print(item)
 ```
 
 ##Item 11
 
+Pre: Q18_11
+Week 2: Q18_3
+
+```{r}
+#pre results
+pre_item11 <- pre_week2_with_means %>% 
+  select(Q1,
+         Q18_11) %>% 
+  rename(PreSurvey = Q18_11)
+
+print(pre_item11)
+
+#week 2 (AKA post) results
+post_item11 <- post_week2_with_means %>% 
+  select(Q1,
+         Q18_3) %>% 
+  rename(Week2 = Q18_3)
+
+print(post_item11)
+
+#combine pre and post results
+item <- full_join(x = pre_item11, y = post_item11) %>% 
+  rename(Participant = Q1)
+print(item)
+```
+
 ##Item 13
+
+Pre: Q18_13
+Week 2: Q18_4
+
+```{r}
+#pre results
+pre_item13 <- pre_week2_with_means %>% 
+  select(Q1,
+         Q18_13) %>% 
+  rename(PreSurvey = Q18_13)
+
+print(pre_item13)
+
+#week 2 (AKA post) results
+post_item13 <- post_week2_with_means %>% 
+  select(Q1,
+         Q18_4) %>% 
+  rename(Week2 = Q18_4)
+
+print(post_item13)
+
+#combine pre and post results
+item <- full_join(x = pre_item13, y = post_item13) %>% 
+  rename(Participant = Q1)
+print(item)
+```
 
 ##Item 15
 
+Pre: Q18_15
+Week 2: Q18_5
+
+```{r}
+#pre results
+pre_item <- pre_week2_with_means %>% 
+  select(Q1,
+         Q18_15) %>% 
+  rename(PreSurvey = Q18_15)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_week2_with_means %>% 
+  select(Q1,
+         Q18_5) %>% 
+  rename(Week2 = Q18_5)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
+
 ##Item 16
+
+Pre: Q18_16
+Week 2: Q18_6
+
+```{r}
+#pre results
+pre_item <- pre_week2_with_means %>% 
+  select(Q1,
+         Q18_16) %>% 
+  rename(PreSurvey = Q18_16)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_week2_with_means %>% 
+  select(Q1,
+         Q18_6) %>% 
+  rename(Week2 = Q18_6)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
 
 ##Item 17
 
+Pre: Q18_17
+Week 2: Q18_7
+
+```{r}
+#pre results
+pre_item <- pre_week2_with_means %>% 
+  select(Q1,
+         Q18_17) %>% 
+  rename(PreSurvey = Q18_17)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_week2_with_means %>% 
+  select(Q1,
+         Q18_7) %>% 
+  rename(Week2 = Q18_7)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
+
 ##Item 18
 
+Pre: Q18_18
+Week 2: Q18_8
+
+```{r}
+#pre results
+pre_item <- pre_week2_with_means %>% 
+  select(Q1,
+         Q18_18) %>% 
+  rename(PreSurvey = Q18_18)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_week2_with_means %>% 
+  select(Q1,
+         Q18_8) %>% 
+  rename(Week2 = Q18_8)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
+
 ##Item 20
+
+Pre: Q18_20
+Week 2: Q18_9
+
+```{r}
+#pre results
+pre_item <- pre_week2_with_means %>% 
+  select(Q1,
+         Q18_20) %>% 
+  rename(PreSurvey = Q18_20)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_week2_with_means %>% 
+  select(Q1,
+         Q18_9) %>% 
+  rename(Week2 = Q18_9)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
 
 #Week 3: Radical Hope
 
