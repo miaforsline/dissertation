@@ -40,10 +40,6 @@ librarian::shelf(
 # Read in Survey Data
 - The raw Excel data was exported from Qualtrics 
 
-First, create an R chunk: Command + option + I makes a code chunk appear on the Mac
-
-Note: you can run an entire R code chunk by pressing the green arrow button OR using Shift + Command + Return on a Mac 
-
 ```{r read_in_data}
 #filepath & here function takes everything in green & helps R locate the correct file path
 filepath <- here("../")
@@ -152,28 +148,178 @@ follow_up_clean <- follow_up %>%
   )
 ```
 
+#Read in Codebook 
+
+```{r codebook}
+#filepath & here function takes everything in green & helps R locate the correct file path
+filepath <- here("../")
+#"../" means one file outside of this file
+print(filepath) #double check the filepath is correct
+#filename function tells R where the exact file is located
+
+filename <- list.files(path = filepath, pattern = "BQL Master Codebook.xlsx") #which file do we want to read in?
+
+print(filename) #check which file we have selected
+#print function means 'show me what is in this file'
+
+#4 columns
+codebook_demographics <- read_excel(path = here(filepath, filename[1]), sheet = "Demographics") %>% 
+  mutate("Source Construct" = NA,
+         "Reverse" = NA,
+         "New Value" = NA)
+codebook_black <- read_excel(path = here(filepath, filename[1]), sheet = "Black Identity") %>% 
+  mutate("Source Construct" = NA,
+         "Reverse" = NA,
+         "New Value" = NA)
+codebook_lgbt <- read_excel(path = here(filepath, filename[1]), sheet = "LGBTQIA+ Identity Scale") %>% 
+  mutate("Source Construct" = NA,
+         "Reverse" = NA,
+         "New Value" = NA)
+codebook_action <- read_excel(path = here(filepath, filename[1]), sheet = "Critical Action") %>% 
+  mutate("Source Construct" = NA,
+         "Reverse" = NA,
+         "New Value" = NA)
+codebook_hope <- read_excel(path = here(filepath, filename[1]), sheet = "Radical Hope") %>% 
+  mutate("Source Construct" = NA,
+         "Reverse" = NA,
+         "New Value" = NA)
+codebook_empowerment <- read_excel(path = here(filepath, filename[1]), sheet = "Empowerment") %>% 
+  mutate("Source Construct" = NA,
+         "Reverse" = NA,
+         "New Value" = NA)
+
+#source construct = 5 columns
+codebook_anxiety <- read_excel(path = here(filepath, filename[1]), sheet = "PHQ-4 Anxiety Depression") %>%
+  mutate() %>% 
+  mutate("Reverse" = NA,
+         "New Value" = NA)
+codebook_ryff <- read_excel(path = here(filepath, filename[1]), sheet = "Ryff Wellbeing") %>% 
+  mutate("Reverse" = NA,
+         "New Value" = NA)
+
+#reverse-coding = 6 columns
+codebook_consciousness <- read_excel(path = here(filepath, filename[1]), sheet = "Critical Consciousness") %>% 
+  mutate("Source Construct" = NA)
+codebook_community <- read_excel(path = here(filepath, filename[1]), sheet = "Collective Self-Esteem") %>% 
+  mutate("Source Construct" = NA)
+
+
+
+codebook <- rbind(
+  codebook_demographics,
+  codebook_anxiety,
+  codebook_ryff,
+  codebook_black,
+  codebook_lgbt,
+  codebook_action,
+  codebook_consciousness,
+  codebook_community,
+  codebook_hope,
+  codebook_empowerment
+) %>% 
+  rename(NewValue = "New Value") %>% 
+  #if_else() must work with characters
+  mutate(CombinedValues = if_else(is.na(NewValue), Value, as.character(NewValue)))
+```
+
 #Week 1: Radical Healing
 
 #Week 2: Critical Consciousness
 
 n = 3
 
+##Reverse code Week 2 data
+
+```{r}
+pre_week2 <- pre_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q18_")
+  ) %>% 
+  #change class to numeric for all columns that start with "Q9_"
+  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) %>% 
+  #format long data to join to codebook
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+
+#pull out the reverse codes
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  )
+
+#join the survey data to the codebook 
+pre_week2_codebook <- left_join(x = pre_week2, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+pre_week2 <- pre_week2_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
+  )
+```
+
 ##Item 1
 
 Q18_1
 
 ```{r}
-pre_item1 <- pre_survey_clean %>% 
+pre_item1 <- pre_week2 %>% 
   select(
     Q1, 
-    starts_with("Q9_")
-  ) %>% 
-  #change class to numeric for all columns that start with "Q9_"
-  mutate_at(vars(starts_with("Q9_")), funs(as.numeric(as.character(.))))
+    Q18_1
+  ) %>%
+  group_by(Q1) %>% 
+  #calculate overall avg
+  summarize(avg = mean(Q18_1), n = n()) %>%
+  ungroup %>%
+  #adorn avg bottom row
+  bind_rows(summarize(., Q1 = "Overall Avg", 
+                         avg = sum(avg * n) / sum(n), 
+                         n = sum(n))) %>%
+  select(-n)
+
+print(pre_item1)
 ```
 
-
 ##Item 10
+
+```{r}
+pre_item1 <- pre_week2 %>% 
+  select(
+    Q1, 
+    Q18_1
+  ) %>%
+  group_by(Q1) %>% 
+  #calculate overall avg
+  summarize(avg = mean(Q18_1), n = n()) %>%
+  ungroup %>%
+  #adorn avg bottom row
+  bind_rows(summarize(., Q1 = "Overall Avg", 
+                         avg = sum(avg * n) / sum(n), 
+                         n = sum(n))) %>%
+  select(-n)
+
+print(pre_item1)
+```
 
 ##Item 11
 
