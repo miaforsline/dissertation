@@ -635,7 +635,9 @@ pre_week3_with_means <- rbind(pre_week3, pre_week3_means)
 print(pre_week3_with_means)
 ```
 
-```{r pre_week3}
+Week 3
+
+```{r post_week3}
 post_week3 <- week3_clean %>% 
   select(
     Q1, 
@@ -827,9 +829,120 @@ print(item)
 
 #Week 4: Emotional & Social Support
 
+Pre-Survey
+
+```{r pre_week4}
+pre_week4 <- pre_survey_clean %>% 
+  select(
+    Q1, 
+    Q9_12,
+    Q23_3
+  ) %>% 
+  #change class to numeric
+  mutate(
+    Q9_12 = as.numeric(Q9_12),
+    Q23_3 = as.numeric(Q23_3)
+  )
+ 
+
+#calculate each question's mean
+pre_week4_means <- pre_week4 %>% 
+  summarise_each(funs(mean( .,na.rm = TRUE)))
+
+#rename average row
+pre_week4_means$Q1[is.na(pre_week4_means$Q1)] <- "Average"
+
+#append means to original scores
+pre_week4_with_means <- rbind(pre_week4, pre_week4_means)
+
+print(pre_week4_with_means)
+```
+
+Week 4
+
+```{r post_week4}
+post_week4 <- week4_clean %>% 
+  select(
+    Q1, 
+    Q9_12,
+    Q23_3
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with(c("Q9_", "Q23_")), ~ gsub("[^0-9.-]+", "", .))) %>%  
+  #change class to numeric
+  mutate(
+    Q9_12 = as.numeric(Q9_12),
+    Q23_3 = as.numeric(Q23_3)
+  )
+ 
+#calculate each question's mean
+post_week4_means <- post_week4 %>% 
+  summarise_each(funs(mean( .,na.rm = TRUE)))
+
+#rename average row
+post_week4_means$Q1[is.na(post_week4_means$Q1)] <- "Average"
+
+#append means to original scores
+post_week4_with_means <- rbind(post_week4, post_week4_means)
+
+print(post_week4_with_means)
+```
+
 ##Item 12
 
+Pre: Q9_12
+Week 4: Q9_12
+
+```{r}
+#pre results
+pre_item <- pre_week4_with_means %>% 
+  select(Q1,
+         Q9_12) %>% 
+  rename(PreSurvey = Q9_12)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_week4_with_means %>% 
+  select(Q1,
+         Q9_12) %>% 
+  rename(Week4 = Q9_12)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
+
 ##Item 3
+
+Pre: Q23_3
+Week 4: Q23_3
+
+```{r}
+#pre results
+pre_item <- pre_week4_with_means %>% 
+  select(Q1,
+         Q23_3) %>% 
+  rename(PreSurvey = Q23_3)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_week4_with_means %>% 
+  select(Q1,
+         Q23_3) %>% 
+  rename(Week4 = Q23_3)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
 
 #Week 5: Strength & Resistance 
 
