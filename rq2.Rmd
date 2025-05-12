@@ -946,27 +946,255 @@ print(item)
 
 #Week 5: Strength & Resistance 
 
-##Item 4
+Pre-Survey missing data
 
-##Item 5
+Week 5
 
-##Item 6
+Q54_X
 
-##Item 7
+```{r post_week5}
+post_week5 <- week5_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q54_")
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with(c("Q54_")), ~ gsub("[^0-9.-]+", "", .))) %>%
+  #change class to numeric for all columns that start with "Q9_"
+  mutate_at(vars(starts_with("Q54_")), funs(as.numeric(as.character(.))))
+ 
+#calculate each question's mean
+post_week5_means <- post_week5 %>% 
+  summarise_each(funs(mean( .,na.rm = TRUE)))
+
+#rename average row
+post_week5_means$Q1[is.na(post_week5_means$Q1)] <- "Average"
+
+#append means to original scores
+post_week5_with_means <- rbind(post_week5, post_week5_means)
+
+print(post_week5_with_means)
+```
 
 #Post-Test: Self & Cultural Authenticity
 
+QID12_
+
+```{r pre}
+pre <- pre_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("QID12_")
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with(c("QID12_")), ~ gsub("[^0-9.-]+", "", .))) %>%
+  #change class to numeric for all columns that start with "Q9_"
+  mutate_at(vars(starts_with("QID12_")), funs(as.numeric(as.character(.))))
+ 
+#calculate each question's mean
+pre_means <- pre %>% 
+  summarise_each(funs(mean( .,na.rm = TRUE)))
+
+#rename average row
+pre_means$Q1[is.na(pre_means$Q1)] <- "Average"
+
+#append means to original scores
+pre_with_means <- rbind(pre, pre_means)
+
+print(pre_with_means)
+```
+
+```{r post}
+post <- post_survey_clean %>% 
+  select(
+    Q1, 
+    starts_with("QID12_")
+  ) %>% 
+  #keep only numeric values
+  mutate(across(starts_with(c("QID12_")), ~ gsub("[^0-9.-]+", "", .))) %>%
+  #change class to numeric for all columns that start with "Q9_"
+  mutate_at(vars(starts_with("QID12_")), funs(as.numeric(as.character(.))))
+ 
+#calculate each question's mean
+post_means <- post %>% 
+  summarise_each(funs(mean( .,na.rm = TRUE)))
+
+#rename average row
+post_means$Q1[is.na(post_means$Q1)] <- "Average"
+
+#append means to original scores
+post_with_means <- rbind(post, post_means)
+
+print(post_with_means)
+```
+
 ##Item 4
+
+Pre: QID12_4
+Week 4: QID12_4
+
+```{r}
+#pre results
+pre_item <- pre_with_means %>% 
+  select(Q1,
+         QID12_4) %>% 
+  rename(PreSurvey = QID12_4)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_with_means %>% 
+  select(Q1,
+         QID12_4) %>% 
+  rename(PostTest = QID12_4)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
 
 ##Item 8
 
+Pre: QID12_8
+Week 4: QID12_8
+
+```{r}
+#pre results
+pre_item <- pre_with_means %>% 
+  select(Q1,
+         QID12_8) %>% 
+  rename(PreSurvey = QID12_8)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_with_means %>% 
+  select(Q1,
+         QID12_8) %>% 
+  rename(PostTest = QID12_8)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
+
 ##Item 10
+
+Pre: QID12_10
+Week 4: QID12_10
+
+```{r}
+#pre results
+pre_item <- pre_with_means %>% 
+  select(Q1,
+         QID12_10) %>% 
+  rename(PreSurvey = QID12_10)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_with_means %>% 
+  select(Q1,
+         QID12_10) %>% 
+  rename(PostTest = QID12_10)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
 
 ##Item 12
 
+Pre: QID12_12
+Week 4: QID12_12
+
+```{r}
+#pre results
+pre_item <- pre_with_means %>% 
+  select(Q1,
+         QID12_12) %>% 
+  rename(PreSurvey = QID12_12)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_with_means %>% 
+  select(Q1,
+         QID12_12) %>% 
+  rename(PostTest = QID12_12)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
+
 ##Item 14
 
+Pre: QID12_14
+Week 4: QID12_14
+
+```{r}
+#pre results
+pre_item <- pre_with_means %>% 
+  select(Q1,
+         QID12_14) %>% 
+  rename(PreSurvey = QID12_14)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_with_means %>% 
+  select(Q1,
+         QID12_14) %>% 
+  rename(PostTest = QID12_14)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
+
 ##Item 16
+
+Pre: QID12_16
+Week 4: QID12_16
+
+```{r}
+#pre results
+pre_item <- pre_with_means %>% 
+  select(Q1,
+         QID12_16) %>% 
+  rename(PreSurvey = QID12_16)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_with_means %>% 
+  select(Q1,
+         QID12_16) %>% 
+  rename(PostTest = QID12_16)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
 
 
 
