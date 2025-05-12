@@ -359,7 +359,7 @@ print(post_week2_with_means)
 
 Q18_1
 
-```{r item1}
+```{r}
 #pre results
 pre_item1 <- pre_week2_with_means %>% 
   select(Q1,
@@ -659,15 +659,171 @@ print(post_week3_with_means)
 
 ##Item 1
 
+Pre: Q21_1
+Week 3: Q21_1
+
+```{r}
+#pre results
+pre_item <- pre_week3_with_means %>% 
+  select(Q1,
+         Q21_1) %>% 
+  rename(PreSurvey = Q21_1)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_week3_with_means %>% 
+  select(Q1,
+         Q21_1) %>% 
+  rename(Week3 = Q21_1)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
+
 ##Item 2
+
+Pre: Q21_2
+Week 3: Q21_2
+
+```{r}
+#pre results
+pre_item <- pre_week3_with_means %>% 
+  select(Q1,
+         Q21_2) %>% 
+  rename(PreSurvey = Q21_2)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_week3_with_means %>% 
+  select(Q1,
+         Q21_2) %>% 
+  rename(Week3 = Q21_2)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
 
 ##Item 3
 
+Pre: Q21_3
+Week 3: Q21_3
+
+```{r}
+#pre results
+pre_item <- pre_week3_with_means %>% 
+  select(Q1,
+         Q21_3) %>% 
+  rename(PreSurvey = Q21_3)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_week3_with_means %>% 
+  select(Q1,
+         Q21_3) %>% 
+  rename(Week3 = Q21_3)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
+
 ##Item 4
+
+Pre: Q21_4
+Week 3: Q21_4
+
+```{r}
+#pre results
+pre_item <- pre_week3_with_means %>% 
+  select(Q1,
+         Q21_4) %>% 
+  rename(PreSurvey = Q21_4)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_week3_with_means %>% 
+  select(Q1,
+         Q21_4) %>% 
+  rename(Week3 = Q21_4)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
 
 ##Item 5
 
+Pre: Q21_5
+Week 3: Q21_5
+
+```{r}
+#pre results
+pre_item <- pre_week3_with_means %>% 
+  select(Q1,
+         Q21_5) %>% 
+  rename(PreSurvey = Q21_5)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_week3_with_means %>% 
+  select(Q1,
+         Q21_5) %>% 
+  rename(Week3 = Q21_5)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
+
 ##Item 6
+
+Pre: Q21_6
+Week 3: Q21_6
+
+```{r}
+#pre results
+pre_item <- pre_week3_with_means %>% 
+  select(Q1,
+         Q21_6) %>% 
+  rename(PreSurvey = Q21_6)
+
+print(pre_item)
+
+#week 2 (AKA post) results
+post_item <- post_week3_with_means %>% 
+  select(Q1,
+         Q21_6) %>% 
+  rename(Week3 = Q21_6)
+
+print(post_item)
+
+#combine pre and post results
+item <- full_join(x = pre_item, y = post_item) %>% 
+  rename(Participant = Q1)
+print(item)
+```
 
 #Week 4: Emotional & Social Support
 
