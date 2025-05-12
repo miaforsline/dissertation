@@ -230,7 +230,9 @@ n = 3
 
 ##Reverse code Week 2 data
 
-```{r}
+Pre-Survey
+
+```{r pre_week2}
 pre_week2 <- pre_survey_clean %>% 
   select(
     Q1, 
@@ -277,11 +279,63 @@ pre_week2 <- pre_week2_codebook %>%
   )
 ```
 
+Week 2
+
+```{r post_week2}
+post_week2 <- week2_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q18_")
+  ) %>% 
+  #keep only the first digit
+  mutate(across(starts_with("Q18_"), ~ gsub("(^\\d{1}).*", "\\1", .))) %>% 
+  #change class to numeric for all columns that start with "Q9_"
+  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) %>% 
+  #format long data to join to codebook
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+
+#pull out the reverse codes
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  )
+
+#join the survey data to the codebook 
+post_week2_codebook <- left_join(x = post_week2, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+post_week2 <- post_week2_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
+  )
+```
+
+
 ##Item 1
 
 Q18_1
 
-```{r}
+```{r pre_item1}
 pre_item1 <- pre_week2 %>% 
   select(
     Q1, 
@@ -295,15 +349,14 @@ pre_item1 <- pre_week2 %>%
   bind_rows(summarize(., Q1 = "Overall Avg", 
                          avg = sum(avg * n) / sum(n), 
                          n = sum(n))) %>%
-  select(-n)
+  select(-n) %>% 
+  rename(pre_survey = avg)
 
 print(pre_item1)
 ```
 
-##Item 10
-
-```{r}
-pre_item1 <- pre_week2 %>% 
+```{r post_item1}
+post_item1 <- post_week2 %>% 
   select(
     Q1, 
     Q18_1
@@ -316,9 +369,42 @@ pre_item1 <- pre_week2 %>%
   bind_rows(summarize(., Q1 = "Overall Avg", 
                          avg = sum(avg * n) / sum(n), 
                          n = sum(n))) %>%
+  select(-n) %>% 
+  rename(post_survey = avg)
+
+print(post_item1)
+```
+
+Combine pre and post results
+
+```{r item1}
+item <- full_join(x = pre_item1, y = post_item1) %>% 
+  rename(participant = Q1)
+print(item)
+```
+
+
+##Item 10
+
+Q18_10
+
+```{r pre_item10}
+pre_item10 <- pre_week2 %>% 
+  select(
+    Q1, 
+    Q18_10
+  ) %>%
+  group_by(Q1) %>% 
+  #calculate overall avg
+  summarize(avg = mean(Q18_10), n = n()) %>%
+  ungroup %>%
+  #adorn avg bottom row
+  bind_rows(summarize(., Q1 = "Overall Avg", 
+                         avg = sum(avg * n) / sum(n), 
+                         n = sum(n))) %>%
   select(-n)
 
-print(pre_item1)
+print(pre_item10)
 ```
 
 ##Item 11
