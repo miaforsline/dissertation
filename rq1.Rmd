@@ -1263,7 +1263,7 @@ pre_consciousness <- pre_survey_clean %>%
                names_to = "Variable Name",
                values_to = "Value")
 
-#pull out the reverse 
+#pull out the reverse codes
 reverse_codes <- codebook %>% 
   filter(str_detect(Reverse, "Y")) %>% 
   select(
