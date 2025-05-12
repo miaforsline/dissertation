@@ -7,7 +7,13 @@ output: html_document
 
 # Objective
 
-To complete Research Question 2
+To complete Research Question 2, which compares item scores in each week's module. 
+
+For example, Week 1 (Radical Healing) averages each participant's score for each item from Pre-Survey and Week 1. Then, we compare the average score from Pre-Survey to Week 1 to analyze changes over time. 
+
+For Week 2 (Critical Consciousness), we compare the average score from Pre-Survey to Week 2 results. 
+
+For Week 3 (Radical Hope), we compare the average score from Pre-Survey to Week 3, and so on. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -39,6 +45,7 @@ librarian::shelf(
 
 # Read in Survey Data
 - The raw Excel data was exported from Qualtrics 
+- This is the same survey data used in `rq1.Rmd`
 
 ```{r read_in_data}
 #filepath & here function takes everything in green & helps R locate the correct file path
@@ -67,29 +74,19 @@ follow_up <- read_excel(path = here(filepath, filename[1]), sheet = 9)
 # Clean the data 
 We want to drop the "dummy" participants from pre-survey results 
 - AKA we want to remove fake data based on Q1
-- Jackie indicated that there are 3 real participants: BELL, BER, and LAS
-- We will remove everyone else 
 
 Week 1 had no real data
 
 Refer to BQL Survey Data - CLEAN - FINAL to see how many real participants completed each week's survey
 
-```{r}
-#(option + minus sign) is the keyboard shortcut for the assignment arrow (<-)
-##you can also type out the assignment arrow
+Note that this cleaning process is identical to that used in `rq1.Rmd`
 
-#first, we will create a "clean" version of the data based on the original BQL_Data object
+```{r}
 pre_survey_clean <- pre_survey %>% 
-  #(shift + command + m) creates a pipe symbol
-  
-  #then we will filter based on column Q1
   filter(
     Q1 == "BELL" | Q1 == "BER" | Q1 == "LAS"
   ) %>% 
-  
-  #then we will drop rows that have NA values in column Q4 because this row is incomplete data 
   drop_na(Q4)
-#filter function tells Data what to pull out from the Excel sheet
 
 week2_clean <- week2 %>% 
   mutate(
@@ -150,6 +147,8 @@ follow_up_clean <- follow_up %>%
 
 #Read in Codebook 
 
+- This is the same codebook used in `rq1.Rmd`
+
 ```{r codebook}
 #filepath & here function takes everything in green & helps R locate the correct file path
 filepath <- here("../")
@@ -203,8 +202,6 @@ codebook_consciousness <- read_excel(path = here(filepath, filename[1]), sheet =
 codebook_community <- read_excel(path = here(filepath, filename[1]), sheet = "Collective Self-Esteem") %>% 
   mutate("Source Construct" = NA)
 
-
-
 codebook <- rbind(
   codebook_demographics,
   codebook_anxiety,
@@ -224,11 +221,15 @@ codebook <- rbind(
 
 #Week 1: Radical Healing
 
+Missing all data from Week 1 survey
+
 #Week 2: Critical Consciousness
 
 n = 3
 
 ##Reverse code Week 2 data
+
+Refer to the Results Table Excel sheet to better understand which questions correspond with which week
 
 Pre-Survey
 
@@ -238,7 +239,7 @@ pre_week2 <- pre_survey_clean %>%
     Q1, 
     starts_with("Q18_")
   ) %>% 
-  #change class to numeric for all columns that start with "Q9_"
+  #change class to numeric for all columns that start with "Q18_"
   mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) %>% 
   #format long data to join to codebook
   pivot_longer(cols = !Q1,
@@ -264,8 +265,10 @@ pre_week2_codebook <- left_join(x = pre_week2, y = reverse_codes) %>%
   mutate(
     NewValue = as.character(NewValue),
     Value = as.character(Value),
+    #identify the correct value to use
     CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
 
+#reformat to wide for analysis
 pre_week2 <- pre_week2_codebook %>% 
   select(
     -NewValue,
@@ -288,10 +291,13 @@ pre_week2_means$Q1[is.na(pre_week2_means$Q1)] <- "Average"
 #append means to original scores
 pre_week2_with_means <- rbind(pre_week2, pre_week2_means)
 
+#examine the output
 print(pre_week2_with_means)
 ```
 
 Week 2
+
+We will compare this to the pre-survey data
 
 ```{r post_week2}
 post_week2 <- week2_clean %>% 
@@ -301,7 +307,7 @@ post_week2 <- week2_clean %>%
   ) %>% 
   #keep only the first digit
   mutate(across(starts_with("Q18_"), ~ gsub("(^\\d{1}).*", "\\1", .))) %>%
-  #change class to numeric for all columns that start with "Q9_"
+  #change class to numeric for all columns that start with "Q18_"
   mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) %>% 
   #format long data to join to codebook
   pivot_longer(cols = !Q1,
@@ -353,7 +359,7 @@ post_week2_with_means <- rbind(post_week2, post_week2_means)
 
 print(post_week2_with_means)
 ```
-
+Now that the data has been cleaned and formatted, isolate each item to compare the pre-survey and week 2 data
 
 ##Item 1
 
@@ -384,6 +390,8 @@ print(item)
 
 
 ##Item 10
+
+Note that some items have different question variable names in the pre-survey versus the Week 2 survey 
 
 Pre: Q18_10
 Week 2: Q18_2
@@ -610,6 +618,8 @@ print(item)
 #Week 3: Radical Hope
 
 n = 3
+
+Not all data needs to be reverse coded
 
 Pre-Survey
 
