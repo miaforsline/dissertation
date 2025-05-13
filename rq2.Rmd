@@ -148,61 +148,26 @@ follow_up_clean <- follow_up %>%
 #Read in Codebook 
 
 - This is the same Pre-Survey Codebook used in `rq1.Rmd`
+- Some minimal cleaning in Excel was done to ensure all tabs have the same column names
 
 ```{r pre_codebook}
-#filepath & here function takes everything in green & helps R locate the correct file path
 filepath <- here("../")
-#"../" means one file outside of this file
 print(filepath) #double check the filepath is correct
-#filename function tells R where the exact file is located
-
 filename <- list.files(path = filepath, pattern = "BQL Master Codebook.xlsx") #which file do we want to read in?
-
 print(filename) #check which file we have selected
-#print function means 'show me what is in this file'
 
-#4 columns
-codebook_demographics <- read_excel(path = here(filepath, filename[1]), sheet = "Demographics") %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
-codebook_black <- read_excel(path = here(filepath, filename[1]), sheet = "Black Identity") %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
-codebook_lgbt <- read_excel(path = here(filepath, filename[1]), sheet = "LGBTQIA+ Identity Scale") %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
-codebook_action <- read_excel(path = here(filepath, filename[1]), sheet = "Critical Action") %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
-codebook_hope <- read_excel(path = here(filepath, filename[1]), sheet = "Radical Hope") %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
-codebook_empowerment <- read_excel(path = here(filepath, filename[1]), sheet = "Empowerment") %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
+codebook_demographics <- read_excel(path = here(filepath, filename[1]), sheet = "Demographics") 
+codebook_black <- read_excel(path = here(filepath, filename[1]), sheet = "Black Identity") 
+codebook_lgbt <- read_excel(path = here(filepath, filename[1]), sheet = "LGBTQIA+ Identity Scale") 
+codebook_action <- read_excel(path = here(filepath, filename[1]), sheet = "Critical Action") 
+codebook_hope <- read_excel(path = here(filepath, filename[1]), sheet = "Radical Hope") 
+codebook_empowerment <- read_excel(path = here(filepath, filename[1]), sheet = "Empowerment") 
+codebook_anxiety <- read_excel(path = here(filepath, filename[1]), sheet = "PHQ-4 Anxiety Depression") 
+codebook_ryff <- read_excel(path = here(filepath, filename[1]), sheet = "Ryff Wellbeing") 
+codebook_consciousness <- read_excel(path = here(filepath, filename[1]), sheet = "Critical Consciousness")
+codebook_community <- read_excel(path = here(filepath, filename[1]), sheet = "Collective Self-Esteem") 
 
-#source construct = 5 columns
-codebook_anxiety <- read_excel(path = here(filepath, filename[1]), sheet = "PHQ-4 Anxiety Depression") %>%
-  mutate() %>% 
-  mutate("Reverse" = NA,
-         "New Value" = NA)
-codebook_ryff <- read_excel(path = here(filepath, filename[1]), sheet = "Ryff Wellbeing") %>% 
-  mutate("Reverse" = NA,
-         "New Value" = NA)
-
-#reverse-coding = 6 columns
-codebook_consciousness <- read_excel(path = here(filepath, filename[1]), sheet = "Critical Consciousness") %>% 
-  mutate("Source Construct" = NA)
-codebook_community <- read_excel(path = here(filepath, filename[1]), sheet = "Collective Self-Esteem") %>% 
-  mutate("Source Construct" = NA)
-
-codebook <- rbind(
+codebook_pre <- rbind(
   codebook_demographics,
   codebook_anxiety,
   codebook_ryff,
@@ -216,49 +181,49 @@ codebook <- rbind(
 ) %>% 
   rename(NewValue = "New Value") %>% 
   #if_else() must work with characters
-  mutate(CombinedValues = if_else(is.na(NewValue), Value, as.character(NewValue)))
+  mutate(CombinedValues = if_else(is.na(NewValue), Value, as.character(NewValue)),
+         Week = "Pre-Survey")
 ```
 
 In addition to the Pre-Survey Codebook, there are unique Codebooks for each week's worth of data because each weekly survey has unique question variable names 
 
 ```{r weeks_codebook}
-#filepath & here function takes everything in green & helps R locate the correct file path
 filepath <- here("../")
-#"../" means one file outside of this file
 print(filepath) #double check the filepath is correct
-#filename function tells R where the exact file is located
-
 filename <- list.files(path = filepath, pattern = "BQL Master Codebook.xlsx") #which file do we want to read in?
-
 print(filename) #check which file we have selected
-#print function means 'show me what is in this file'
 
-#5 columns
-codebook_week2 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 2") 
-codebook_week4 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 4")
-codebook_week5 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 5")
-codebook_week6 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 6")
+codebook_week2 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 2") %>% 
+  mutate(Week = "Week 2")
+codebook_week3 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 3") %>% 
+  mutate(Week = "Week 3")
+codebook_week4 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 4") %>% 
+  mutate(Week = "Week 4")
+codebook_week5 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 5") %>% 
+  mutate(Week = "Week 5")
+codebook_week6 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 6") %>% 
+  mutate(Week = "Week 6")
 
-#6 columns
-codebook_week3 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 3")
 
 
-codebook <- rbind(
-  codebook_demographics,
-  codebook_anxiety,
-  codebook_ryff,
-  codebook_black,
-  codebook_lgbt,
-  codebook_action,
-  codebook_consciousness,
-  codebook_community,
-  codebook_hope,
-  codebook_empowerment
+codebook_weekly <- rbind(
+  codebook_week2,
+  codebook_week3,
+  codebook_week4,
+  codebook_week5,
+  codebook_week6
 ) %>% 
   rename(NewValue = "New Value") %>% 
   #if_else() must work with characters
-  mutate(CombinedValues = if_else(is.na(NewValue), Value, as.character(NewValue)))
+  mutate(CombinedValues = if_else(is.na(NewValue), Value, NewValue))
 ```
+
+Combine pre-survey and weekly codebooks
+
+```{r codebook}
+codebook <- rbind(codebook_pre, codebook_weekly)
+```
+
 
 #Week 1: Radical Healing
 
