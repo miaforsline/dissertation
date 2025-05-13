@@ -271,44 +271,7 @@ post_week2 <- week2_clean %>%
   #keep only the first digit
   mutate(across(starts_with("Q18_"), ~ gsub("(^\\d{1}).*", "\\1", .))) %>%
   #change class to numeric for all columns that start with "Q18_"
-  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) %>% 
-  #format long data to join to codebook
-  pivot_longer(cols = !Q1,
-               names_to = "Variable Name",
-               values_to = "Value")
-
-
-#pull out the reverse codes
-reverse_codes <- codebook %>% 
-  filter(str_detect(Reverse, "Y")) %>% 
-  select(
-    "Variable Name",
-    Value,
-    NewValue
-  ) %>% 
-  mutate(
-    Value = as.numeric(Value)
-  )
-
-#join the survey data to the codebook 
-post_week2_codebook <- left_join(x = post_week2, y = reverse_codes) %>% 
-  #if_else() must work with characters
-  mutate(
-    NewValue = as.character(NewValue),
-    Value = as.character(Value),
-    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
-
-post_week2 <- post_week2_codebook %>% 
-  select(
-    -NewValue,
-    -Value
-  ) %>% 
-  rename(Value = CorrectedValue) %>% 
-  mutate(Value = as.numeric(Value)) %>% 
-  pivot_wider(
-    names_from = "Variable Name",
-    values_from = "Value"
-  )
+  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) 
 
 #calculate each question's mean
 post_week2_means <- post_week2 %>% 
@@ -582,8 +545,6 @@ print(item)
 
 n = 3
 
-Reverse code the data
-
 Pre-Survey
 
 ```{r pre_week3}
@@ -841,6 +802,8 @@ print(item)
 
 #Week 4: Emotional & Social Support
 
+Reverse code item 12
+
 Pre-Survey
 
 ```{r pre_week4}
@@ -854,8 +817,48 @@ pre_week4 <- pre_survey_clean %>%
   mutate(
     Q9_12 = as.numeric(Q9_12),
     Q23_3 = as.numeric(Q23_3)
+  ) %>% 
+  #format long data to join to codebook
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+#pull out the reverse codes
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  filter(Week == "Week 4") %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue,
+    Week
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  ) %>% 
+  select(-Week)
+
+#join the survey data to the codebook 
+pre_week4_codebook <- left_join(x = pre_week4, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    #identify the correct value to use
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+#reformat to wide for analysis
+pre_week4 <- pre_week4_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
   )
- 
 
 #calculate each question's mean
 pre_week4_means <- pre_week4 %>% 
@@ -879,14 +882,55 @@ post_week4 <- week4_clean %>%
     Q9_12,
     Q23_3
   ) %>% 
-  #keep only numeric values
-  mutate(across(starts_with(c("Q9_", "Q23_")), ~ gsub("[^0-9.-]+", "", .))) %>%  
+  #keep only numeric digits
+  mutate(across(starts_with(c("Q9_", "Q23_")), ~ gsub("[^0-9.-]+", "", .))) %>%
   #change class to numeric
   mutate(
     Q9_12 = as.numeric(Q9_12),
     Q23_3 = as.numeric(Q23_3)
+  ) %>% 
+  #format long data to join to codebook
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+#pull out the reverse codes
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  filter(Week == "Week 4") %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue,
+    Week
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  ) %>% 
+  select(-Week)
+
+#join the survey data to the codebook 
+post_week4_codebook <- left_join(x = post_week4, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    #identify the correct value to use
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+#reformat to wide for analysis
+post_week4 <- post_week4_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
   )
- 
+
 #calculate each question's mean
 post_week4_means <- post_week4 %>% 
   summarise_each(funs(mean( .,na.rm = TRUE)))
@@ -992,18 +1036,70 @@ print(post_week5_with_means)
 
 Use the pre-survey codebook 
 
-QID12_
+Reverse code items4 and 12
+
+- QID12_
+- Q20_9
+- Q20_10
+- Q20_11
+- Q20_12
 
 ```{r pre}
 pre <- pre_survey_clean %>% 
   select(
     Q1, 
-    starts_with("QID12_")
+    starts_with("QID12_"),
+    Q20_9,
+    Q20_10,
+    Q20_11,
+    Q20_12
   ) %>% 
   #keep only numeric values
-  mutate(across(starts_with(c("QID12_")), ~ gsub("[^0-9.-]+", "", .))) %>%
+  mutate(across(starts_with(c("QID12_", "Q20")), ~ gsub("[^0-9.-]+", "", .))) %>%
   #change class to numeric for all columns that start with "Q9_"
-  mutate_at(vars(starts_with("QID12_")), funs(as.numeric(as.character(.))))
+  mutate_at(vars(starts_with(c("QID12_", "Q20_"))), funs(as.numeric(as.character(.)))) %>% 
+  #format long data to join to codebook
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+#pull out the reverse codes
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue,
+    Week
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  ) %>% 
+  filter(Week == "Pre-Survey") %>% 
+  select(-Week)
+
+#join the survey data to the codebook 
+pre_codebook <- left_join(x = pre, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    #identify the correct value to use
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+#reformat to wide for analysis
+pre <- pre_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
+  )
+ 
  
 #calculate each question's mean
 pre_means <- pre %>% 
@@ -1022,12 +1118,58 @@ print(pre_with_means)
 post <- post_survey_clean %>% 
   select(
     Q1, 
-    starts_with("QID12_")
+    starts_with("QID12_"),
+    Q20_9,
+    Q20_10,
+    Q20_11,
+    Q20_12
   ) %>% 
   #keep only numeric values
-  mutate(across(starts_with(c("QID12_")), ~ gsub("[^0-9.-]+", "", .))) %>%
+  mutate(across(starts_with(c("QID12_", "Q20")), ~ gsub("[^0-9.-]+", "", .))) %>%
   #change class to numeric for all columns that start with "Q9_"
-  mutate_at(vars(starts_with("QID12_")), funs(as.numeric(as.character(.))))
+  mutate_at(vars(starts_with(c("QID12_", "Q20_"))), funs(as.numeric(as.character(.)))) %>% 
+  #format long data to join to codebook
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+#pull out the reverse codes
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue,
+    Week
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  ) %>% 
+  filter(Week == "Pre-Survey") %>% 
+  select(-Week)
+
+#join the survey data to the codebook 
+post_codebook <- left_join(x = post, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    #identify the correct value to use
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+#reformat to wide for analysis
+post <- post_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
+  )
+ 
  
 #calculate each question's mean
 post_means <- post %>% 
@@ -1044,23 +1186,23 @@ print(post_with_means)
 
 ##Item 4
 
-Pre: QID12_4
-Week 4: QID12_4
+Pre: Q20_9
+Week 4: Q20_9
 
 ```{r}
 #pre results
 pre_item <- pre_with_means %>% 
   select(Q1,
-         QID12_4) %>% 
-  rename(PreSurvey = QID12_4)
+         Q20_9) %>% 
+  rename(PreSurvey = Q20_9)
 
 print(pre_item)
 
 #week 2 (AKA post) results
 post_item <- post_with_means %>% 
   select(Q1,
-         QID12_4) %>% 
-  rename(PostTest = QID12_4)
+         Q20_9) %>% 
+  rename(PostTest = Q20_9)
 
 print(post_item)
 
@@ -1072,23 +1214,23 @@ print(item)
 
 ##Item 8
 
-Pre: QID12_8
-Week 4: QID12_8
+Pre: Q20_10
+Week 4: Q20_10
 
 ```{r}
 #pre results
 pre_item <- pre_with_means %>% 
   select(Q1,
-         QID12_8) %>% 
-  rename(PreSurvey = QID12_8)
+         Q20_10) %>% 
+  rename(PreSurvey = Q20_10)
 
 print(pre_item)
 
 #week 2 (AKA post) results
 post_item <- post_with_means %>% 
   select(Q1,
-         QID12_8) %>% 
-  rename(PostTest = QID12_8)
+         Q20_10) %>% 
+  rename(PostTest = Q20_10)
 
 print(post_item)
 
@@ -1128,23 +1270,23 @@ print(item)
 
 ##Item 12
 
-Pre: QID12_12
-Week 4: QID12_12
+Pre: Q20_11
+Week 4: Q20_11
 
 ```{r}
 #pre results
 pre_item <- pre_with_means %>% 
   select(Q1,
-         QID12_12) %>% 
-  rename(PreSurvey = QID12_12)
+         Q20_11) %>% 
+  rename(PreSurvey = Q20_11)
 
 print(pre_item)
 
 #week 2 (AKA post) results
 post_item <- post_with_means %>% 
   select(Q1,
-         QID12_12) %>% 
-  rename(PostTest = QID12_12)
+         Q20_11) %>% 
+  rename(PostTest = Q20_11)
 
 print(post_item)
 
@@ -1184,23 +1326,23 @@ print(item)
 
 ##Item 16
 
-Pre: QID12_16
-Week 4: QID12_16
+Pre: Q20_12
+Week 4: Q20_12
 
 ```{r}
 #pre results
 pre_item <- pre_with_means %>% 
   select(Q1,
-         QID12_16) %>% 
-  rename(PreSurvey = QID12_16)
+         Q20_12) %>% 
+  rename(PreSurvey = Q20_12)
 
 print(pre_item)
 
 #week 2 (AKA post) results
 post_item <- post_with_means %>% 
   select(Q1,
-         QID12_16) %>% 
-  rename(PostTest = QID12_16)
+         Q20_12) %>% 
+  rename(PostTest = Q20_12)
 
 print(post_item)
 
