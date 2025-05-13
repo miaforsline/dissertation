@@ -170,84 +170,31 @@ NUMBER (#) of people who checked each category
 - Income
 - Political Action
 
-First, we will look at all the questions participants answered (in the Pre-Survey)
+First, we will read about how to [Recode Variables](https://www.anyamemensah.com/blog/recoding) in R. 
 
-```{r questions}
-questions <- pre_survey %>% 
-  filter(StartDate == "Start Date") %>% 
-  pivot_longer(
-    cols = starts_with("Q"),
-    names_to = "Question",
-    values_to = "Description"
-  ) %>% 
-  select(
-    Question,
-    Description
-  )
+##Read in Codebook 
 
-nrow(questions)
-```
+- This is the same Pre-Survey Codebook used in `rq1.Rmd`
+- Some minimal cleaning in Excel was done to ensure all tabs have the same column names
 
-Next, we will read about how to [Recode Variables](https://www.anyamemensah.com/blog/recoding) in R. 
-
-Then, we will read in the Code Book Jackie developed
-
-```{r codebook}
-#filepath & here function takes everything in green & helps R locate the correct file path
+```{r pre_codebook}
 filepath <- here("../")
-#"../" means one file outside of this file
 print(filepath) #double check the filepath is correct
-#filename function tells R where the exact file is located
-
 filename <- list.files(path = filepath, pattern = "BQL Master Codebook.xlsx") #which file do we want to read in?
-
 print(filename) #check which file we have selected
-#print function means 'show me what is in this file'
 
-#4 columns
-codebook_demographics <- read_excel(path = here(filepath, filename[1]), sheet = "Demographics") %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
-codebook_black <- read_excel(path = here(filepath, filename[1]), sheet = "Black Identity") %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
-codebook_lgbt <- read_excel(path = here(filepath, filename[1]), sheet = "LGBTQIA+ Identity Scale") %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
-codebook_action <- read_excel(path = here(filepath, filename[1]), sheet = "Critical Action") %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
-codebook_hope <- read_excel(path = here(filepath, filename[1]), sheet = "Radical Hope") %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
-codebook_empowerment <- read_excel(path = here(filepath, filename[1]), sheet = "Empowerment") %>% 
-  mutate("Source Construct" = NA,
-         "Reverse" = NA,
-         "New Value" = NA)
+codebook_demographics <- read_excel(path = here(filepath, filename[1]), sheet = "Demographics") 
+codebook_black <- read_excel(path = here(filepath, filename[1]), sheet = "Black Identity") 
+codebook_lgbt <- read_excel(path = here(filepath, filename[1]), sheet = "LGBTQIA+ Identity Scale") 
+codebook_action <- read_excel(path = here(filepath, filename[1]), sheet = "Critical Action") 
+codebook_hope <- read_excel(path = here(filepath, filename[1]), sheet = "Radical Hope") 
+codebook_empowerment <- read_excel(path = here(filepath, filename[1]), sheet = "Empowerment") 
+codebook_anxiety <- read_excel(path = here(filepath, filename[1]), sheet = "PHQ-4 Anxiety Depression") 
+codebook_ryff <- read_excel(path = here(filepath, filename[1]), sheet = "Ryff Wellbeing") 
+codebook_consciousness <- read_excel(path = here(filepath, filename[1]), sheet = "Critical Consciousness")
+codebook_community <- read_excel(path = here(filepath, filename[1]), sheet = "Collective Self-Esteem") 
 
-#source construct = 5 columns
-codebook_anxiety <- read_excel(path = here(filepath, filename[1]), sheet = "PHQ-4 Anxiety Depression") %>%
-  mutate() %>% 
-  mutate("Reverse" = NA,
-         "New Value" = NA)
-codebook_ryff <- read_excel(path = here(filepath, filename[1]), sheet = "Ryff Wellbeing") %>% 
-  mutate("Reverse" = NA,
-         "New Value" = NA)
-
-#reverse-coding = 6 columns
-codebook_consciousness <- read_excel(path = here(filepath, filename[1]), sheet = "Critical Consciousness") %>% 
-  mutate("Source Construct" = NA)
-codebook_community <- read_excel(path = here(filepath, filename[1]), sheet = "Collective Self-Esteem") %>% 
-  mutate("Source Construct" = NA)
-
-
-
-codebook <- rbind(
+codebook_pre <- rbind(
   codebook_demographics,
   codebook_anxiety,
   codebook_ryff,
@@ -261,9 +208,11 @@ codebook <- rbind(
 ) %>% 
   rename(NewValue = "New Value") %>% 
   #if_else() must work with characters
-  mutate(CombinedValues = if_else(is.na(NewValue), Value, as.character(NewValue)))
+  mutate(CombinedValues = if_else(is.na(NewValue), Value, as.character(NewValue)),
+         Week = "Pre-Survey")
 ```
 
+##Demographics
 
 Then we will look at what participants answered when asked about: 
 - their Race/Ethnicity (Q36 and Q36_11_TEXT)
@@ -925,75 +874,194 @@ print(class.df)
 
 All Q9 questions
 
+Reverse coding
+
 H1b: Participants were hypothesized to report higher scores on the Ryff Psychological Wellbeing Scale at post-test and follow-up than pre-test. Descriptive analysis showed that at pre-test, the mean average score was 3.33; at post-test, the mean average was 3; and at follow-up, the mean average score was 3.39 suggesting…. 
 
-```{r pre_rhyff}
-pre_rhyff <- pre_survey_clean %>% 
+```{r pre_ryff}
+pre_ryff <- pre_survey_clean %>% 
   select(
     Q1, 
     starts_with("Q9_")
   ) %>% 
   #change class to numeric for all columns that start with "Q9_"
-  mutate_at(vars(starts_with("Q9_")), funs(as.numeric(as.character(.))))
+  mutate_at(vars(starts_with("Q9_")), funs(as.numeric(as.character(.)))) %>% 
+  #format long data to join to codebook
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+#pull out the reverse codes
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  )
+
+#join the survey data to the codebook 
+pre_ryff_codebook <- left_join(x = pre_ryff, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+pre_ryff <- pre_ryff_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
+  ) %>% 
+  #unnest after pivot_wider()
+  unnest() %>% 
+  unique()
 
 #how many questions are asked
-n <- (ncol(pre_rhyff) - 1)
+n <- (ncol(pre_ryff) - 1)
+print(n)
+if(n >= ncol(pre_ryff))stop("Check n")
 
 #calculate the mean score per participant
-pre_rhyff$average <- rowMeans(pre_rhyff[grep('^Q9_', names(pre_rhyff))])
+pre_ryff$average <- round(rowMeans(pre_ryff[grep('^Q9_', names(pre_ryff))]), digits = 2)
 
-print(pre_rhyff)
+print(pre_ryff)
 
-pre_rhyff_mean_avg <- round(mean(pre_rhyff$average), digits = 2)
-print(pre_rhyff_mean_avg)
+pre_ryff_mean_avg <- round(mean(pre_ryff$average), digits = 2)
+print(pre_ryff_mean_avg)
 ```
 
-```{r post_rhyff}
-post_rhyff <- post_survey_clean %>% 
+```{r post_ryff}
+post_ryff <- post_survey_clean %>% 
   select(
     Q1, 
     starts_with("Q9_")
   ) %>% 
-  #keep only the first digit
-  mutate(across(starts_with("Q9_"), ~ gsub("(^\\d{1}).*", "\\1", .))) %>% 
   #change class to numeric for all columns that start with "Q9_"
-  mutate_at(vars(starts_with("Q9_")), funs(as.numeric(as.character(.))))
+  mutate_at(vars(starts_with("Q9_")), funs(as.numeric(as.character(.)))) %>% 
+  #format long data to join to codebook
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+#pull out the reverse codes
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  )
+
+#join the survey data to the codebook 
+post_ryff_codebook <- left_join(x = post_ryff, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+post_ryff <- post_ryff_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
+  ) %>% 
+  #unnest after pivot_wider()
+  unnest() %>% 
+  unique()
 
 #how many questions are asked
-n <- (ncol(post_rhyff) - 1)
+n <- (ncol(post_ryff) - 1)
 print(n)
+if(n >= ncol(post_ryff))stop("Check n")
 
 #calculate the mean score per participant
-post_rhyff$average <- rowMeans(post_rhyff[grep('^Q9_', names(post_rhyff))])
+post_ryff$average <- round(rowMeans(post_ryff[grep('^Q9_', names(post_ryff))]), digits = 2)
 
-print(post_rhyff)
+print(post_ryff)
 
-post_rhyff_mean_avg <- mean(post_rhyff$avg)
-print(post_rhyff_mean_avg)
+post_ryff_mean_avg <- round(mean(post_ryff$average), digits = 2)
+print(post_ryff_mean_avg)
 ```
 
-```{r follow_up_rhyff}
-follow_up_rhyff <- follow_up_clean %>% 
+```{r follow_up_ryff}
+follow_up_ryff <- follow_up_clean %>% 
   select(
     Q1, 
     starts_with("Q9_")
   ) %>% 
-  #keep only the first digit
-  mutate(across(starts_with("Q9_"), ~ gsub("(^\\d{1}).*", "\\1", .))) %>% 
   #change class to numeric for all columns that start with "Q9_"
-  mutate_at(vars(starts_with("Q9_")), funs(as.numeric(as.character(.))))
+  mutate_at(vars(starts_with("Q9_")), funs(as.numeric(as.character(.)))) %>% 
+  #format long data to join to codebook
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+#pull out the reverse codes
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  )
+
+#join the survey data to the codebook 
+follow_up_ryff_codebook <- left_join(x = follow_up_ryff, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+follow_up_ryff <- follow_up_ryff_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
+  ) %>% 
+  #unnest after pivot_wider()
+  unnest() %>% 
+  unique()
 
 #how many questions are asked
-n <- (ncol(follow_up_rhyff) - 1)
+n <- (ncol(follow_up_ryff) - 1)
 print(n)
+if(n >= ncol(follow_up_ryff))stop("Check n")
 
 #calculate the mean score per participant
-follow_up_rhyff$average <- round(rowMeans(follow_up_rhyff[grep('^Q9_', names(follow_up_rhyff))]), digits = 2)
+follow_up_ryff$average <- round(rowMeans(follow_up_ryff[grep('^Q9_', names(follow_up_ryff))]), digits = 2)
 
-print(follow_up_rhyff)
+print(follow_up_ryff)
 
-follow_up_rhyff_mean_avg <- mean(follow_up_rhyff$avg)
-print(follow_up_rhyff_mean_avg)
+follow_up_ryff_mean_avg <- round(mean(follow_up_ryff$average), digits = 2)
+print(follow_up_ryff_mean_avg)
 ```
 
 ```{r mean_average_summary}
@@ -1006,18 +1074,18 @@ Survey <- c("Pre-Survey",
             "Follow-Up") 
 
 #how many participants per survey ?
-Participants <- c(nrow(pre_rhyff), 
-            nrow(post_rhyff),
-            nrow(follow_up_rhyff)) 
+Participants <- c(nrow(pre_ryff), 
+            nrow(post_ryff),
+            nrow(follow_up_ryff)) 
 
 #mean average score per week
-MeanAverage <- c(pre_rhyff_mean_avg, 
-                 post_rhyff_mean_avg, 
-                 follow_up_rhyff_mean_avg)
+MeanAverage <- c(pre_ryff_mean_avg, 
+                 post_ryff_mean_avg, 
+                 follow_up_ryff_mean_avg)
 
 Average <- c(NA, 
-             post_rhyff$average,
-             follow_up_rhyff$average)
+             post_ryff$average,
+             follow_up_ryff$average)
 
 #create the data frame 
 class.df <- data.frame(Survey,
