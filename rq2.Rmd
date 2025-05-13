@@ -147,9 +147,9 @@ follow_up_clean <- follow_up %>%
 
 #Read in Codebook 
 
-- This is the same codebook used in `rq1.Rmd`
+- This is the same Pre-Survey Codebook used in `rq1.Rmd`
 
-```{r codebook}
+```{r pre_codebook}
 #filepath & here function takes everything in green & helps R locate the correct file path
 filepath <- here("../")
 #"../" means one file outside of this file
@@ -219,6 +219,47 @@ codebook <- rbind(
   mutate(CombinedValues = if_else(is.na(NewValue), Value, as.character(NewValue)))
 ```
 
+In addition to the Pre-Survey Codebook, there are unique Codebooks for each week's worth of data because each weekly survey has unique question variable names 
+
+```{r weeks_codebook}
+#filepath & here function takes everything in green & helps R locate the correct file path
+filepath <- here("../")
+#"../" means one file outside of this file
+print(filepath) #double check the filepath is correct
+#filename function tells R where the exact file is located
+
+filename <- list.files(path = filepath, pattern = "BQL Master Codebook.xlsx") #which file do we want to read in?
+
+print(filename) #check which file we have selected
+#print function means 'show me what is in this file'
+
+#5 columns
+codebook_week2 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 2") 
+codebook_week4 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 4")
+codebook_week5 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 5")
+codebook_week6 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 6")
+
+#6 columns
+codebook_week3 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 3")
+
+
+codebook <- rbind(
+  codebook_demographics,
+  codebook_anxiety,
+  codebook_ryff,
+  codebook_black,
+  codebook_lgbt,
+  codebook_action,
+  codebook_consciousness,
+  codebook_community,
+  codebook_hope,
+  codebook_empowerment
+) %>% 
+  rename(NewValue = "New Value") %>% 
+  #if_else() must work with characters
+  mutate(CombinedValues = if_else(is.na(NewValue), Value, as.character(NewValue)))
+```
+
 #Week 1: Radical Healing
 
 Missing all data from Week 1 survey
@@ -226,10 +267,6 @@ Missing all data from Week 1 survey
 #Week 2: Critical Consciousness
 
 n = 3
-
-##Reverse code Week 2 data
-
-Refer to the Results Table Excel sheet to better understand which questions correspond with which week
 
 Pre-Survey
 
@@ -240,46 +277,7 @@ pre_week2 <- pre_survey_clean %>%
     starts_with("Q18_")
   ) %>% 
   #change class to numeric for all columns that start with "Q18_"
-  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) %>% 
-  #format long data to join to codebook
-  pivot_longer(cols = !Q1,
-               names_to = "Variable Name",
-               values_to = "Value")
-
-
-#pull out the reverse codes
-reverse_codes <- codebook %>% 
-  filter(str_detect(Reverse, "Y")) %>% 
-  select(
-    "Variable Name",
-    Value,
-    NewValue
-  ) %>% 
-  mutate(
-    Value = as.numeric(Value)
-  )
-
-#join the survey data to the codebook 
-pre_week2_codebook <- left_join(x = pre_week2, y = reverse_codes) %>% 
-  #if_else() must work with characters
-  mutate(
-    NewValue = as.character(NewValue),
-    Value = as.character(Value),
-    #identify the correct value to use
-    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
-
-#reformat to wide for analysis
-pre_week2 <- pre_week2_codebook %>% 
-  select(
-    -NewValue,
-    -Value
-  ) %>% 
-  rename(Value = CorrectedValue) %>% 
-  mutate(Value = as.numeric(Value)) %>% 
-  pivot_wider(
-    names_from = "Variable Name",
-    values_from = "Value"
-  )
+  mutate_at(vars(starts_with("Q18_")), funs(as.numeric(as.character(.)))) 
 
 #calculate each question's mean
 pre_week2_means <- pre_week2 %>% 
@@ -619,7 +617,7 @@ print(item)
 
 n = 3
 
-Not all data needs to be reverse coded
+Reverse code the data
 
 Pre-Survey
 
@@ -630,7 +628,46 @@ pre_week3 <- pre_survey_clean %>%
     starts_with("Q21_")
   ) %>% 
   #change class to numeric for all columns that start with "Q9_"
-  mutate_at(vars(starts_with("Q21_")), funs(as.numeric(as.character(.))))
+  mutate_at(vars(starts_with("Q21_")), funs(as.numeric(as.character(.)))) %>% 
+  #format long data to join to codebook
+  pivot_longer(cols = !Q1,
+               names_to = "Variable Name",
+               values_to = "Value")
+
+
+#pull out the reverse codes
+reverse_codes <- codebook %>% 
+  filter(str_detect(Reverse, "Y")) %>% 
+  select(
+    "Variable Name",
+    Value,
+    NewValue
+  ) %>% 
+  mutate(
+    Value = as.numeric(Value)
+  )
+
+#join the survey data to the codebook 
+pre_week3_codebook <- left_join(x = pre_week3, y = reverse_codes) %>% 
+  #if_else() must work with characters
+  mutate(
+    NewValue = as.character(NewValue),
+    Value = as.character(Value),
+    #identify the correct value to use
+    CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
+
+#reformat to wide for analysis
+pre_week3 <- pre_week3_codebook %>% 
+  select(
+    -NewValue,
+    -Value
+  ) %>% 
+  rename(Value = CorrectedValue) %>% 
+  mutate(Value = as.numeric(Value)) %>% 
+  pivot_wider(
+    names_from = "Variable Name",
+    values_from = "Value"
+  )
 
 #calculate each question's mean
 pre_week3_means <- pre_week3 %>% 
@@ -987,6 +1024,8 @@ print(post_week5_with_means)
 ```
 
 #Post-Test: Self & Cultural Authenticity
+
+Use the pre-survey codebook 
 
 QID12_
 
