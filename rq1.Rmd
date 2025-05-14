@@ -12,7 +12,7 @@ output: html_document
 - To summarize and visualize demographic data 
 - To read in the Codebook associated with the Pre-Survey data
 
-- To calculate mean average scores and average scores for 8 scales: 
+- To calculate mean average scores and average scores for 8 scales (AKA Research Question 1): 
 1. PHQ-4 Anxiety & Depression
 2. Ryff Psychological Wellbeing
 3. Black Identity
@@ -208,7 +208,7 @@ codebook_consciousness <- read_excel(path = here(filepath, filename[1]), sheet =
 codebook_community <- read_excel(path = here(filepath, filename[1]), sheet = "Collective Self-Esteem") 
 
 #combine all tabs
-codebook_pre <- rbind(
+codebook <- rbind(
   codebook_demographics,
   codebook_anxiety,
   codebook_ryff,
