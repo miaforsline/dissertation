@@ -5,15 +5,21 @@ date: "2025-05-10"
 output: html_document
 ---
 
+# Workflow
+
+Before using this .Rmd file, examine `rq1.Rmd`, which contains essential context for this project. 
+
 # Objective
 
-To complete Research Question 2, which compares item scores in each week's module. 
+- To complete Research Question 2, which compares item scores in each week's module. 
 
 For example, Week 1 (Radical Healing) averages each participant's score for each item from Pre-Survey and Week 1. Then, we compare the average score from Pre-Survey to Week 1 to analyze changes over time. 
 
 For Week 2 (Critical Consciousness), we compare the average score from Pre-Survey to Week 2 results. 
 
 For Week 3 (Radical Hope), we compare the average score from Pre-Survey to Week 3, and so on. 
+
+Refer to the Results Table Excel sheet for further details. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -72,12 +78,7 @@ follow_up <- read_excel(path = here(filepath, filename[1]), sheet = 9)
 ```
 
 # Clean the data 
-We want to drop the "dummy" participants from pre-survey results 
-- AKA we want to remove fake data based on Q1
-
 Week 1 had no real data
-
-Refer to BQL Survey Data - CLEAN - FINAL to see how many real participants completed each week's survey
 
 Note that this cleaning process is identical to that used in `rq1.Rmd`
 
@@ -146,7 +147,6 @@ follow_up_clean <- follow_up %>%
 ```
 
 #Read in Codebook 
-
 - This is the same Pre-Survey Codebook used in `rq1.Rmd`
 - Some minimal cleaning in Excel was done to ensure all tabs have the same column names
 
@@ -802,7 +802,7 @@ print(item)
 
 #Week 4: Emotional & Social Support
 
-Reverse code item 12
+Reverse code item 12 using the Week 4 Codebook 
 
 Pre-Survey
 
@@ -944,7 +944,7 @@ post_week4_with_means <- rbind(post_week4, post_week4_means)
 print(post_week4_with_means)
 ```
 
-##Item 12
+##Item 12 (Reverse Coded)
 
 Pre: Q9_12
 Week 4: Q9_12
@@ -1006,7 +1006,7 @@ Pre-Survey missing data
 
 Week 5
 
-Q54_X
+Q54_X questions 
 
 ```{r post_week5}
 post_week5 <- week5_clean %>% 
@@ -1034,9 +1034,7 @@ print(post_week5_with_means)
 
 #Post-Test: Self & Cultural Authenticity
 
-Use the pre-survey codebook 
-
-Reverse code items4 and 12
+Use the Pre-Survey Codebook to reverse code items 4 and 12
 
 - QID12_
 - Q20_9
@@ -1184,7 +1182,7 @@ post_with_means <- rbind(post, post_means)
 print(post_with_means)
 ```
 
-##Item 4
+##Item 4 (Reverse Coded)
 
 Pre: Q20_9
 Week 4: Q20_9
@@ -1268,7 +1266,7 @@ item <- full_join(x = pre_item, y = post_item) %>%
 print(item)
 ```
 
-##Item 12
+##Item 12 (Reverse Coded)
 
 Pre: Q20_11
 Week 4: Q20_11
