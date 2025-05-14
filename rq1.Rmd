@@ -11,6 +11,7 @@ output: html_document
 - To clean and organize the data
 - To summarize and visualize demographic data 
 - To read in the Codebook associated with the Pre-Survey data
+
 - To calculate mean average scores and average scores for 8 scales: 
 1. PHQ-4 Anxiety & Depression
 2. Ryff Psychological Wellbeing
@@ -21,7 +22,7 @@ output: html_document
 7. Radical Hope
 8. Empowerment
 
-This is part of Jacquelyn Chin's 2025 dissertation defense. Almost at the finish line, baddie!!
+This will contribute to Jacquelyn Chin's June 2025 dissertation defense. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -84,7 +85,7 @@ follow_up <- read_excel(path = here(filepath, filename[1]), sheet = 9)
 
 # Clean the data 
 We want to drop the "dummy" participants from pre-survey results 
-- AKA we want to remove fake data based on Q1
+- AKA we want to remove fake data based on Q1 (which is the unique identifier for each participant)
 - Jackie indicated that there are 3 real participants: BELL, BER, and LAS
 - We will remove everyone else 
 
@@ -178,13 +179,14 @@ NUMBER (#) of people who checked each category
 - Education
 - Employment
 - Income
-- Political Action
+- Political Action (AKA Critical Action)
+  - split into 5 questions 
 
 First, we will read about how to [Recode Variables](https://www.anyamemensah.com/blog/recoding) in R. 
 
 ##Read in Codebook 
 
-- This is the same Pre-Survey Codebook used in `rq1.Rmd`
+- This is the same Pre-Survey Codebook used in `rq2.Rmd`
 - Some minimal cleaning in Excel was done to ensure all tabs have the same column names
 
 ```{r pre_codebook}
@@ -193,6 +195,7 @@ print(filepath) #double check the filepath is correct
 filename <- list.files(path = filepath, pattern = "BQL Master Codebook.xlsx") #which file do we want to read in?
 print(filename) #check which file we have selected
 
+#read in each Excel tab
 codebook_demographics <- read_excel(path = here(filepath, filename[1]), sheet = "Demographics") 
 codebook_black <- read_excel(path = here(filepath, filename[1]), sheet = "Black Identity") 
 codebook_lgbt <- read_excel(path = here(filepath, filename[1]), sheet = "LGBTQIA+ Identity Scale") 
@@ -204,6 +207,7 @@ codebook_ryff <- read_excel(path = here(filepath, filename[1]), sheet = "Ryff We
 codebook_consciousness <- read_excel(path = here(filepath, filename[1]), sheet = "Critical Consciousness")
 codebook_community <- read_excel(path = here(filepath, filename[1]), sheet = "Collective Self-Esteem") 
 
+#combine all tabs
 codebook_pre <- rbind(
   codebook_demographics,
   codebook_anxiety,
@@ -216,9 +220,11 @@ codebook_pre <- rbind(
   codebook_hope,
   codebook_empowerment
 ) %>% 
+  #get rid of the space in New Value
   rename(NewValue = "New Value") %>% 
   #if_else() must work with characters
   mutate(CombinedValues = if_else(is.na(NewValue), Value, as.character(NewValue)),
+         #note this is for the Pre-Survey data only
          Week = "Pre-Survey")
 ```
 
@@ -226,6 +232,8 @@ codebook_pre <- rbind(
 
 Then we will look at what participants answered when asked about: 
 - their Race/Ethnicity (Q36 and Q36_11_TEXT)
+
+Note that one person used the open text field to enter data
 
 ```{r race_ethnicity}
 race_ethnicity <- pre_survey_clean %>% 
@@ -681,22 +689,16 @@ print(political_action_summary)
 
 # RQ 1: Scales
 
-TASK FOR JACKIE: Double-check that descriptions are correct for analysis
-
-Scale
-Measure
-Which Weeks to Pull
-How Many People per timepoint
-Helpful to know their codes (e.g. Las, Bell, Tor)
+Next, we will address Research Question 1, which makes hypotheses about 8 psychological scales. 
 
 ## PHQ-4 Anxiety & Depression
 
 PHQ-4 Anxiety & Depression (ALL ITEMS in Q8.Q8_1, Q8_2, Q8_3, and Q8_4)
-- Averaging the total of this measure's items for 3 people
+- Averaging the total of this measure's items for n people
 - Reporting the mean average scores in Pre-Survey > Week 2 > Week 4 > Week 6 > Post-Test > Follow-Up 
 - Group by person & average the scores
 
-MANUSCRIPT TEXT:
+Hypothesis: 
 - H1a: Participants were hypothesized to report lower scores on the PHQ-4 Anxiety & Depression scale at post-survey compared to pre-survey. Descriptive analysis showed that at pre-test, the
 mean average score was 1.92 (n=3); at week 2, the average score was 1.3 (n=3); at week 4, the mean average score was 0.75 (n=2); at Week 6, the average was 1 (n=1); and at follow-up, the  average score was 1 (n=1).
 
@@ -857,6 +859,8 @@ follow_up_anxiety$average <- (follow_up_anxiety$Q8_1 + follow_up_anxiety$Q8_2 + 
 print(follow_up_anxiety)
 ```
 
+Now, create a dataframe to visualize the results from the scale
+
 ```{r mean_average_summary}
 # R program to illustrate 
 # data frame from vector 
@@ -894,10 +898,10 @@ print(class.df)
 
 All Q9 questions
 
-Reverse coding
+This scale contains some questions that are reverse coded. The Codebook has been updated to reflect these reverse coded values. Before calculating mean averages, we will need to ensure the  values are coded correctly.   
 
+Hypothesis: 
 H1b: Participants were hypothesized to report higher scores on the Ryff Psychological Wellbeing Scale at post-test and follow-up than pre-test. Descriptive analysis showed that at pre-test, the mean average score was 3.33; at post-test, the mean average was 3; and at follow-up, the mean average score was 3.39 suggesting…. 
-
 ```{r pre_ryff}
 pre_ryff <- pre_survey_clean %>% 
   select(
@@ -929,8 +933,10 @@ pre_ryff_codebook <- left_join(x = pre_ryff, y = reverse_codes) %>%
   mutate(
     NewValue = as.character(NewValue),
     Value = as.character(Value),
+    #create a Corrected Value column that uses the NewValue if there is one, otherwise it uses the original Value
     CorrectedValue = if_else(is.na(NewValue), Value, as.character(NewValue)))
 
+#reformat to calculate mean averages
 pre_ryff <- pre_ryff_codebook %>% 
   select(
     -NewValue,
@@ -1085,9 +1091,6 @@ print(follow_up_ryff_mean_avg)
 ```
 
 ```{r mean_average_summary}
-# R program to illustrate 
-# data frame from vector 
-
 #how many surveys to summarize
 Survey <- c("Pre-Survey", 
             "Post-Survey", 
@@ -1119,6 +1122,7 @@ print(class.df)
 
 Q11 questions
 
+Hypothesis: 
 H1c: Participants were hypothesized to report higher scores on the Black Identity Development Scale at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was 3.38 (n=3); at post-test, the  average was 3.52 (n=1); and at follow-up, the  average score was 3.48 (n=1), suggesting... 
 
 ```{r pre_black}
@@ -1227,6 +1231,7 @@ print(class.df)
 
 All Q12 questions
 
+Hypothesis:
 H1d: Participants were hypothesized to report higher scores on the LGBT Positive Identity Measure at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting… 
 
 ```{r pre_lgbt}
@@ -1334,6 +1339,9 @@ print(class.df)
 
 ##Critical Consciousness
 
+Q18 questions
+
+Hypothesis: 
 H1f: Participants were hypothesized to report increased scores on the Short Critical Consciousness Scale and the Contemporary Critical Consciousness Measures I and II at post-test and follow-up compared to pre-test. Descriptive analysis showed that pre-test mean scores for each scale were ##, ##, and ## respectively, post-test scores were ##, ##, and ##, and follow-up scores were ##, ##, and ##, suggesting... 
 
 Contains Reverse Coding 
@@ -1549,6 +1557,7 @@ print(class.df)
 
 All Q20 and Q57 questions
 
+Hypothesis: 
 H1g: Participants were hypothesized to report higher scores on the Collective Self-Esteem Scale at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting... 
 
 Contains reverse coding
@@ -1766,6 +1775,7 @@ print(class.df)
 
 All Q21 questions
 
+Hypothesis: 
 H1h: Participants were hypothesized to report increased Radical Hope from pre- to post-test and follow-up. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting... 
 
 ```{r pre_hope}
@@ -1880,6 +1890,7 @@ print(class.df)
 
 All Q23 questions 
 
+Hypothesis: 
 H1i: Participants were hypothesized to report higher scores on the Individual-Community Related Empowerment Measure at post-test and follow-up than at pre-test. Descriptive analysis showed that at pre-test, the mean average score was ##, at post-test the mean average was ##, and at follow-up, the mean average score was ##, suggesting... 
 
 ```{r pre_empowerment}
@@ -1983,4 +1994,6 @@ class.df <- data.frame(Survey,
                       Average) 
 print(class.df)
 ```
+
+Results were transferred into an external Excel sheet for further formatting for the final dissertation defense deliverables. 
 
