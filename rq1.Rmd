@@ -7,9 +7,19 @@ output: html_document
 
 # Objective
 
-- To pull up the descriptives/demographic data for the Black, Queer & Liberated mental health intervention project. 
-- To clean the data
+- To pull up the descriptives/demographic data for the Black, Queer & Liberated mental health intervention project
+- To clean and organize the data
 - To summarize and visualize demographic data 
+- To read in the Codebook associated with the Pre-Survey data
+- To calculate mean average scores and average scores for 8 scales: 
+1. PHQ-4 Anxiety & Depression
+2. Ryff Psychological Wellbeing
+3. Black Identity
+4. LGBT Identity
+5. Critical Consciousness
+6. Collective/Community Self-Esteem
+7. Radical Hope
+8. Empowerment
 
 This is part of Jacquelyn Chin's 2025 dissertation defense. Almost at the finish line, baddie!!
 
@@ -484,6 +494,8 @@ print(income_summary)
 
 Q17_1 through Q17_5
 
+1. Q17_1
+
 ```{r critical_action1}
 political_action <- pre_survey_clean %>% 
   select(Q1,
@@ -518,6 +530,8 @@ political_action_summary$n[political_action_summary$Label == "Total"] <- length(
 
 print(political_action_summary)
 ```
+
+2. Q17_2
 
 ```{r critical_action2}
 political_action <- pre_survey_clean %>% 
@@ -554,6 +568,8 @@ political_action_summary$n[political_action_summary$Label == "Total"] <- length(
 print(political_action_summary)
 ```
 
+3. Q17_3
+
 ```{r critical_action3}
 political_action <- pre_survey_clean %>% 
   select(Q1,
@@ -589,6 +605,8 @@ political_action_summary$n[political_action_summary$Label == "Total"] <- length(
 print(political_action_summary)
 ```
 
+4. Q17_4
+
 ```{r critical_action4}
 political_action <- pre_survey_clean %>% 
   select(Q1,
@@ -623,6 +641,8 @@ political_action_summary$n[political_action_summary$Label == "Total"] <- length(
 
 print(political_action_summary)
 ```
+
+5. Q17_5
 
 ```{r critical_action5}
 political_action <- pre_survey_clean %>% 
