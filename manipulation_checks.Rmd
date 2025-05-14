@@ -7,7 +7,7 @@ output: html_document
 
 # Objective
 
-To complete the Manipulation Checks as well as the Acceptability & Feasibility, we must average the scores of specific questions from each weekly survey. For the Manipulation Checks, each week has 3-4 items to average the scores from Week 1 - Week 6. For the Acceptability & Feasibility, there are 12 items to average from the Week 6 data only. 
+To complete the Manipulation Checks as well as the Acceptability & Feasibility, we must average the scores of specific questions from each weekly survey. For the Manipulation Checks, each week has 3-4 items to average the scores from Week 1 - Week 6. For the Acceptability & Feasibility, there are 12 items to average from the Week 6 data only. No reverse coding needed. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -54,15 +54,15 @@ print(filename) #check which file we have selected
 #print function means 'show me what is in this file'
 
 #read_excel() reads in Excel files
-pre_survey <- read_excel(path = here(filepath, filename[1]), sheet = 1) 
-week1 <- read_excel(path = here(filepath, filename[1]), sheet = 2) 
-week2 <- read_excel(path = here(filepath, filename[1]), sheet = 3)
-week3 <- read_excel(path = here(filepath, filename[1]), sheet = 4)
-week4 <- read_excel(path = here(filepath, filename[1]), sheet = 5)
-week5 <- read_excel(path = here(filepath, filename[1]), sheet = 6)
-week6 <- read_excel(path = here(filepath, filename[1]), sheet = 7)
-post_survey <- read_excel(path = here(filepath, filename[1]), sheet = 8)
-follow_up <- read_excel(path = here(filepath, filename[1]), sheet = 9)
+pre_survey <- read_excel(path = here(filepath, filename[1]), sheet = "Pre-Survey") 
+week1 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 1") 
+week2 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 2")
+week3 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 3")
+week4 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 4")
+week5 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 5")
+week6 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 6")
+post_survey <- read_excel(path = here(filepath, filename[1]), sheet = "Post-Survey")
+follow_up <- read_excel(path = here(filepath, filename[1]), sheet = "FollowUp")
 ```
 
 # Clean the data 
@@ -139,42 +139,197 @@ follow_up_clean <- follow_up %>%
   )
 ```
 
-#Read in Codebook 
+#Manipulation Checks
 
-- This is the same Pre-Survey Codebook used in `rq1.Rmd`
-- Some minimal cleaning in Excel was done to ensure all tabs have the same column names
+##Week 1
 
-```{r pre_codebook}
-filepath <- here("../")
-print(filepath) #double check the filepath is correct
-filename <- list.files(path = filepath, pattern = "BQL Master Codebook.xlsx") #which file do we want to read in?
-print(filename) #check which file we have selected
+Missing all Week 1 data
 
-codebook_demographics <- read_excel(path = here(filepath, filename[1]), sheet = "Demographics") 
-codebook_black <- read_excel(path = here(filepath, filename[1]), sheet = "Black Identity") 
-codebook_lgbt <- read_excel(path = here(filepath, filename[1]), sheet = "LGBTQIA+ Identity Scale") 
-codebook_action <- read_excel(path = here(filepath, filename[1]), sheet = "Critical Action") 
-codebook_hope <- read_excel(path = here(filepath, filename[1]), sheet = "Radical Hope") 
-codebook_empowerment <- read_excel(path = here(filepath, filename[1]), sheet = "Empowerment") 
-codebook_anxiety <- read_excel(path = here(filepath, filename[1]), sheet = "PHQ-4 Anxiety Depression") 
-codebook_ryff <- read_excel(path = here(filepath, filename[1]), sheet = "Ryff Wellbeing") 
-codebook_consciousness <- read_excel(path = here(filepath, filename[1]), sheet = "Critical Consciousness")
-codebook_community <- read_excel(path = here(filepath, filename[1]), sheet = "Collective Self-Esteem") 
+##Week 2 (n=3)
 
-codebook_pre <- rbind(
-  codebook_demographics,
-  codebook_anxiety,
-  codebook_ryff,
-  codebook_black,
-  codebook_lgbt,
-  codebook_action,
-  codebook_consciousness,
-  codebook_community,
-  codebook_hope,
-  codebook_empowerment
-) %>% 
-  rename(NewValue = "New Value") %>% 
-  #if_else() must work with characters
-  mutate(CombinedValues = if_else(is.na(NewValue), Value, as.character(NewValue)),
-         Week = "Pre-Survey")
+Item 1-3
+
+```{r}
+item <- week2_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q48_")
+  ) %>% 
+  #keep only numeric digits
+  mutate(across(starts_with(c("Q48")), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with Q48
+  mutate_at(vars(starts_with("Q48_")), funs(as.numeric(as.character(.)))) 
+
+#calculate each question's mean
+item_means <- item %>% 
+  summarise_each(funs(mean( .,na.rm = TRUE)))
+
+#rename average row
+item_means$Q1[is.na(item_means$Q1)] <- "Average"
+
+#append means to original scores
+item_with_means <- rbind(item, item_means)
+
+#examine the output
+print(item_with_means)
 ```
+
+##Week 3 (n=3)
+
+Item 1-3
+
+```{r}
+item <- week3_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q48_")
+  ) %>% 
+  #keep only numeric digits
+  mutate(across(starts_with(c("Q48")), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with Q48
+  mutate_at(vars(starts_with("Q48_")), funs(as.numeric(as.character(.)))) 
+
+#calculate each question's mean
+item_means <- item %>% 
+  summarise_each(funs(mean( .,na.rm = TRUE)))
+
+#rename average row
+item_means$Q1[is.na(item_means$Q1)] <- "Average"
+
+#append means to original scores
+item_with_means <- rbind(item, item_means)
+
+#examine the output
+print(item_with_means)
+```
+
+##Week 4 (n=2)
+
+Item 1-4
+
+```{r}
+item <- week4_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q48_")
+  ) %>% 
+  #keep only numeric digits
+  mutate(across(starts_with(c("Q48")), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with Q48
+  mutate_at(vars(starts_with("Q48_")), funs(as.numeric(as.character(.)))) 
+
+#calculate each question's mean
+item_means <- item %>% 
+  summarise_each(funs(mean( .,na.rm = TRUE)))
+
+#rename average row
+item_means$Q1[is.na(item_means$Q1)] <- "Average"
+
+#append means to original scores
+item_with_means <- rbind(item, item_means)
+
+#examine the output
+print(item_with_means)
+```
+
+##Week 5 (n=2)
+
+Item 1-3
+
+```{r}
+item <- week5_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q48_")
+  ) %>% 
+  #keep only numeric digits
+  mutate(across(starts_with(c("Q48")), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with Q48
+  mutate_at(vars(starts_with("Q48_")), funs(as.numeric(as.character(.)))) 
+
+#calculate each question's mean
+item_means <- item %>% 
+  summarise_each(funs(mean( .,na.rm = TRUE)))
+
+#rename average row
+item_means$Q1[is.na(item_means$Q1)] <- "Average"
+
+#append means to original scores
+item_with_means <- rbind(item, item_means)
+
+#examine the output
+print(item_with_means)
+```
+
+##Week 6 (n=1)
+
+Item 1-3
+
+```{r}
+item <- week6_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q48_")
+  ) %>% 
+  #keep only numeric digits
+  mutate(across(starts_with(c("Q48")), ~ gsub("[^0-9.-]+", "", .))) %>% 
+  #change class to numeric for all columns that start with Q48
+  mutate_at(vars(starts_with("Q48_")), funs(as.numeric(as.character(.)))) 
+
+# #calculate each question's mean
+# item_means <- item %>% 
+#   summarise_each(funs(mean( .,na.rm = TRUE)))
+# 
+# #rename average row
+# item_means$Q1[is.na(item_means$Q1)] <- "Average"
+# 
+# #append means to original scores
+# item_with_means <- rbind(item, item_means)
+# 
+# #examine the output
+# print(item_with_means)
+```
+
+
+
+
+#Acceptability & Feasibility (n=1)
+
+Use Week 6 survey data only 
+
+Items 1-12
+
+Average the score from each item
+
+```{r}
+item <- week6_clean %>% 
+  select(
+    Q1, 
+    starts_with("Q55_")
+  ) %>% 
+  #keep only numeric digits (not hyphens)
+  mutate(across(starts_with(c("Q55")), ~ gsub("[^0-9.]+", "", .))) %>% 
+  #change class to numeric for all columns that start with Q48
+  mutate_at(vars(starts_with("Q55_")), funs(as.numeric(as.character(.)))) %>% 
+  pivot_longer(
+    cols = !Q1,
+    names_to = "Variable Name",
+    values_to = "Value"
+  ) %>% 
+  unnest()
+
+#calculate each question's mean
+item_means <- item %>%
+  summarise_each(funs(mean( .,na.rm = TRUE)))
+
+#rename average row
+item_means$Q1[is.na(item_means$Q1)] <- "Average"
+
+#append means to original scores
+item_with_means <- rbind(item, item_means)
+
+#examine the output
+print(item_with_means)
+```
+
+
