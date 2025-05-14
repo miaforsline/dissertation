@@ -5,9 +5,15 @@ date: "2025-05-14"
 output: html_document
 ---
 
+# Workflow
+
+Run this file after `rq1.Rmd` and `rq2.Rmd` because those files contain essential context for this project. 
+
 # Objective
 
 To complete the Manipulation Checks as well as the Acceptability & Feasibility, we must average the scores of specific questions from each weekly survey. For the Manipulation Checks, each week has 3-4 items to average the scores from Week 1 - Week 6. For the Acceptability & Feasibility, there are 12 items to average from the Week 6 data only. No reverse coding needed. 
+
+This is the last step of the dissertation project data analysis phase. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -39,21 +45,16 @@ librarian::shelf(
 
 # Read in Survey Data
 - The raw Excel data was exported from Qualtrics 
-- This is the same survey data used in `rq1.Rmd`
+- This is the same survey data used in `rq1.Rmd` and `rq2.Rmd`
 
 ```{r read_in_data}
-#filepath & here function takes everything in green & helps R locate the correct file path
 filepath <- here("../")
-#"../" means one file outside of this file
 print(filepath) #double check the filepath is correct
-#filename function tells R where the exact file is located
 
-filename <- list.files(path = filepath, pattern = "BQL Survey Data - CLEAN - FINAL.xlsx") #which file do we want to read in?
-
+filename <- list.files(path = filepath, pattern = "BQL Survey Data - CLEAN - FINAL.xlsx") 
 print(filename) #check which file we have selected
-#print function means 'show me what is in this file'
 
-#read_excel() reads in Excel files
+#read in Excel files
 pre_survey <- read_excel(path = here(filepath, filename[1]), sheet = "Pre-Survey") 
 week1 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 1") 
 week2 <- read_excel(path = here(filepath, filename[1]), sheet = "Week 2")
@@ -66,14 +67,9 @@ follow_up <- read_excel(path = here(filepath, filename[1]), sheet = "FollowUp")
 ```
 
 # Clean the data 
-We want to drop the "dummy" participants from pre-survey results 
-- AKA we want to remove fake data based on Q1
-
 Week 1 had no real data
 
-Refer to BQL Survey Data - CLEAN - FINAL to see how many real participants completed each week's survey
-
-Note that this cleaning process is identical to that used in `rq1.Rmd`
+Note that this cleaning process is identical to that used in `rq1.Rmd` and `rq2.Rmd`
 
 ```{r}
 pre_survey_clean <- pre_survey %>% 
@@ -275,22 +271,7 @@ item <- week6_clean %>%
   mutate(across(starts_with(c("Q48")), ~ gsub("[^0-9.-]+", "", .))) %>% 
   #change class to numeric for all columns that start with Q48
   mutate_at(vars(starts_with("Q48_")), funs(as.numeric(as.character(.)))) 
-
-# #calculate each question's mean
-# item_means <- item %>% 
-#   summarise_each(funs(mean( .,na.rm = TRUE)))
-# 
-# #rename average row
-# item_means$Q1[is.na(item_means$Q1)] <- "Average"
-# 
-# #append means to original scores
-# item_with_means <- rbind(item, item_means)
-# 
-# #examine the output
-# print(item_with_means)
 ```
-
-
 
 
 #Acceptability & Feasibility (n=1)
@@ -331,5 +312,7 @@ item_with_means <- rbind(item, item_means)
 #examine the output
 print(item_with_means)
 ```
+
+Results were transferred into an external Excel sheet for further formatting for the final dissertation defense deliverables. 
 
 
