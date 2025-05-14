@@ -1350,5 +1350,8 @@ item <- full_join(x = pre_item, y = post_item) %>%
 print(item)
 ```
 
+Results were transferred into an external Excel sheet for further formatting for the final dissertation defense deliverables. 
+
+
 
 
